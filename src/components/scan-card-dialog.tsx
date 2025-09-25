@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { scanCardDetails, ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
-import { Loader2, Camera as CameraIcon, X, Zap, ZapOff, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Camera as CameraIcon, X, Zap, ZapOff, Image as ImageIcon, Check, ArrowLeft } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface ScanCardDialogProps {
@@ -44,6 +44,7 @@ export function ScanCardDialog({
   };
 
   const setupCamera = async () => {
+    setImage(null);
     stopCamera();
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
@@ -105,11 +106,21 @@ export function ScanCardDialog({
           description: '無法從卡片中提取詳細資訊。請重試或手動輸入。',
           variant: 'destructive',
         });
-      })
-      .finally(() => {
-        setImage(null);
       });
   };
+
+  const confirmAndScan = () => {
+    if (image) {
+      handleScan(image);
+       // Save image to device
+       const link = document.createElement('a');
+       link.href = image;
+       link.download = `bizcard-${new Date().toISOString()}.png`;
+       document.body.appendChild(link);
+       link.click();
+       document.body.removeChild(link);
+    }
+  }
 
   const takePicture = () => {
     if (videoRef.current && canvasRef.current && hasCameraPermission) {
@@ -119,7 +130,6 @@ export function ScanCardDialog({
         const videoWidth = video.videoWidth;
         const videoHeight = video.videoHeight;
   
-        // Crop the image to the frame
         const sx = videoWidth * 0.05;
         const sy = videoHeight * 0.25;
         const sWidth = videoWidth * 0.9;
@@ -131,15 +141,8 @@ export function ScanCardDialog({
         context.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
         
         const dataUrl = canvasRef.current.toDataURL('image/png');
-        handleScan(dataUrl);
-
-        // Save image to device
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = `bizcard-${new Date().toISOString()}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        setImage(dataUrl);
+        stopCamera();
       }
     }
   };
@@ -189,38 +192,61 @@ export function ScanCardDialog({
         </DialogHeader>
 
         <div className="flex-1 bg-black flex items-center justify-center relative">
-          <video ref={videoRef} className="w-full h-full object-cover" playsInline autoPlay muted />
-          {hasCameraPermission ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <div className="w-[90%] h-[50%] border-4 border-white/80 rounded-2xl shadow-lg bg-black/20" />
-              <p className="absolute top-1/4 left-1/2 -translate-x-1/2 text-white/90 bg-black/50 px-4 py-2 rounded-md text-center">
-                將名片對準掃描框
-              </p>
-            </div>
+          {image ? (
+            <Image src={image} alt="Captured business card" layout="fill" objectFit="contain" />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center p-4">
-               <Alert variant="destructive">
-                <AlertTitle>需要相機權限</AlertTitle>
-                <AlertDescription>
-                  請在瀏覽器設定中啟用相機權限以掃描名片。
-                </AlertDescription>
-              </Alert>
-            </div>
+            <>
+              <video ref={videoRef} className="w-full h-full object-cover" playsInline autoPlay muted />
+              {hasCameraPermission ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <div className="w-[90%] h-[50%] border-4 border-white/80 rounded-2xl shadow-lg bg-black/20" />
+                  <p className="absolute top-1/4 left-1/2 -translate-x-1/2 text-white/90 bg-black/50 px-4 py-2 rounded-md text-center">
+                    將名片對準掃描框
+                  </p>
+                </div>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center p-4">
+                  <Alert variant="destructive">
+                    <AlertTitle>需要相機權限</AlertTitle>
+                    <AlertDescription>
+                      請在瀏覽器設定中啟用相機權限以掃描名片。
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              )}
+            </>
           )}
           <canvas ref={canvasRef} className="hidden" />
         </div>
 
         <div className="p-4 border-t border-gray-700 flex-row justify-between items-center bg-black z-10 flex">
-          <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
-          <Button variant="ghost" onClick={() => fileInputRef.current?.click()} className="p-2">
-            <ImageIcon className="h-8 w-8 text-white" />
-          </Button>
-          <Button onClick={takePicture} disabled={!hasCameraPermission} className="w-20 h-20 rounded-full bg-white hover:bg-gray-200 border-4 border-black disabled:bg-gray-400" />
-          <Button variant="ghost" onClick={toggleFlash} className="p-2">
-            {isFlashOn ? <Zap className="h-8 w-8 text-yellow-400" /> : <ZapOff className="h-8 w-8 text-white" />}
-          </Button>
+          {image ? (
+            <>
+              <Button variant="outline" onClick={setupCamera} className="text-white border-white">
+                <ArrowLeft className="mr-2 h-5 w-5" />
+                重新拍攝
+              </Button>
+              <Button onClick={confirmAndScan} className="bg-primary text-primary-foreground">
+                <Check className="mr-2 h-5 w-5" />
+                使用照片
+              </Button>
+            </>
+          ) : (
+            <>
+              <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
+              <Button variant="ghost" onClick={() => fileInputRef.current?.click()} className="p-2">
+                <ImageIcon className="h-8 w-8 text-white" />
+              </Button>
+              <Button onClick={takePicture} disabled={!hasCameraPermission} className="w-20 h-20 rounded-full bg-white hover:bg-gray-200 border-4 border-black disabled:bg-gray-400" />
+              <Button variant="ghost" onClick={toggleFlash} className="p-2">
+                {isFlashOn ? <Zap className="h-8 w-8 text-yellow-400" /> : <ZapOff className="h-8 w-8 text-white" />}
+              </Button>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+
+    
