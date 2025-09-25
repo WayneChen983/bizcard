@@ -4,6 +4,7 @@ import { Inter, PT_Sans } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
+import { Navbar } from '@/components/navbar';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -41,7 +42,12 @@ export default function RootLayout({
           fontHeadline.variable
         )}
       >
-        {children}
+        <div className="relative flex h-screen w-full justify-center bg-background">
+          <div className="relative flex h-full w-full max-w-md flex-col border-x">
+            {children}
+            <Navbar />
+          </div>
+        </div>
         <Toaster />
       </body>
     </html>

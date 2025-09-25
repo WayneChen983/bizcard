@@ -8,20 +8,21 @@ interface ContactListProps {
   contacts: Contact[];
   onEdit: (contact: Contact) => void;
   onDelete: (id: string) => void;
+  onAddNew: () => void;
 }
 
 export function ContactList({ contacts, onEdit, onDelete }: ContactListProps) {
   if (contacts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted bg-card p-12 text-center">
-        <h3 className="text-lg font-medium text-muted-foreground">No contacts found.</h3>
-        <p className="mt-1 text-sm text-muted-foreground">Add a new contact to get started.</p>
+        <h3 className="text-lg font-medium text-muted-foreground">找不到聯絡人。</h3>
+        <p className="mt-1 text-sm text-muted-foreground">新增聯絡人以開始使用。</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
       {contacts.map((contact) => (
         <ContactCard
           key={contact.id}

@@ -12,4 +12,5 @@ export type Contact = {
   socialMedia: string;
   other: string;
   groups: string[];
+  images?: { url: string; alt?: string }[];
 };

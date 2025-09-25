@@ -16,19 +16,26 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { Contact } from '@/lib/types';
-import { Camera, Loader2 } from 'lucide-react';
-import { useState } from 'react';
-import { ScanCardDialog } from './scan-card-dialog';
+import { Loader2, Trash2 } from 'lucide-react';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { ScanCardDialog } from './scan-card-dialog';
+import { useState } from 'react';
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+  name: z.string().min(1, { message: '姓名為必填欄位' }),
   company: z.string().optional(),
   jobTitle: z.string().optional(),
   phone: z.string().optional(),
   mobilePhone: z.string().optional(),
-  email: z.string().email({ message: 'Invalid email address.' }).optional().or(z.literal('')),
-  website: z.string().url({ message: 'Invalid URL.' }).optional().or(z.literal('')),
+  email: z.string().email({ message: '無效的電子郵件地址' }).optional().or(z.literal('')),
+  website: z.string().url({ message: '無效的網址' }).optional().or(z.literal('')),
   address: z.string().optional(),
   socialMedia: z.string().optional(),
   other: z.string().optional(),
@@ -66,176 +73,163 @@ export function ContactForm({ contact, onSave, isSaving }: ContactFormProps) {
       id: contact?.id || new Date().toISOString(),
       ...values,
       groups: contact?.groups || [],
+      images: contact?.images || [],
     };
     onSave(newContact);
   }
 
   const handleScanComplete = (data: Partial<ScanCardDetailsOutput>) => {
-    // Merge AI data with existing form data, prioritizing AI data for non-empty fields.
     const currentValues = form.getValues();
     const newValues = { ...currentValues };
     for (const key in data) {
-        const typedKey = key as keyof ScanCardDetailsOutput;
-        if (data[typedKey]) {
-            (newValues as any)[typedKey] = data[typedKey];
-        }
+      const typedKey = key as keyof ScanCardDetailsOutput;
+      if (data[typedKey]) {
+        (newValues as any)[typedKey] = data[typedKey];
+      }
     }
     form.reset(newValues);
   };
-  
 
   return (
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-1">
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsScanDialogOpen(true)}
-            >
-              <Camera className="mr-2 h-4 w-4" />
-              Scan with AI
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>姓名</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="company"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>公司</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="jobTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>部門</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <h3 className="font-semibold">聯絡資訊</h3>
+          <FormField
+            control={form.control}
+            name="mobilePhone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>手機電話</FormLabel>
+                <FormControl>
+                  <Input type="tel" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>電子郵件</FormLabel>
+                <FormControl>
+                  <Input type="email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <h3 className="font-semibold">社群媒體</h3>
+          <FormField
+            control={form.control}
+            name="socialMedia"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>LINE</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+           <FormField
+            control={form.control}
+            name="website"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>LinkedIn</FormLabel>
+                <FormControl>
+                   <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+         
+
+          <h3 className="font-semibold">公司資訊</h3>
+           <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>地址</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="other"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>備註</FormLabel>
+                <FormControl>
+                  <Textarea {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex justify-between gap-2 pt-4">
+             {contact && (
+                 <Button type="button" variant="destructive" size="icon">
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            )}
+            <Button type="submit" className="w-full" disabled={isSaving}>
+              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              儲存
             </Button>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Jane Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="company"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Company</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Acme Inc." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="jobTitle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Job Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Marketing Director" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <Input type="tel" placeholder="e.g. 123-456-7890" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="mobilePhone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mobile Phone</FormLabel>
-                  <FormControl>
-                    <Input type="tel" placeholder="e.g. 098-765-4321" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="e.g. jane.doe@acme.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="website"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Website</FormLabel>
-                  <FormControl>
-                    <Input type="url" placeholder="e.g. https://acme.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="e.g. 123 Main St, Anytown, USA" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="socialMedia"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Social Media</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. @janedoe on X" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="other"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Other</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Any other relevant information" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isSaving}>
-            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Save Contact
-          </Button>
         </form>
       </Form>
       <ScanCardDialog
