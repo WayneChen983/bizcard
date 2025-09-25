@@ -27,6 +27,8 @@ export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<Scan
     setIsScanDialogOpen(false);
   };
   
+  const isProfilePage = pathname === '/settings/profile';
+
   return (
     <>
       <nav className="sticky bottom-0 z-10 border-t bg-background">
@@ -39,8 +41,12 @@ export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<Scan
                   <Button
                     variant="default"
                     size="icon"
-                    className="h-16 w-16 rounded-full shadow-lg -translate-y-6"
+                    className={cn(
+                      "h-16 w-16 rounded-full shadow-lg transition-transform duration-300 ease-in-out",
+                      isProfilePage ? "translate-y-24" : "-translate-y-6"
+                    )}
                     onClick={() => setIsScanDialogOpen(true)}
+                    tabIndex={isProfilePage ? -1 : 0}
                   >
                     <item.icon className="h-8 w-8" />
                   </Button>
