@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { Contact } from '@/lib/types';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2, ScanLine } from 'lucide-react';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 import {
   Sheet,
@@ -94,6 +94,16 @@ export function ContactForm({ contact, onSave, isSaving }: ContactFormProps) {
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-1">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => setIsScanDialogOpen(true)}
+          >
+            <ScanLine className="mr-2 h-5 w-5" />
+            掃描名片自動填寫
+          </Button>
+
           <FormField
             control={form.control}
             name="name"
