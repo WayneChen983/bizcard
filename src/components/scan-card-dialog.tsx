@@ -132,6 +132,14 @@ export function ScanCardDialog({
         
         const dataUrl = canvasRef.current.toDataURL('image/png');
         handleScan(dataUrl);
+
+        // Save image to device
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `bizcard-${new Date().toISOString()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
     }
   };
