@@ -120,8 +120,22 @@ export default function Home() {
   };
 
   const handleScanAndCreate = (scannedContact: Contact) => {
-    setEditingContact(scannedContact);
+    const newContact: Contact = {
+      ...scannedContact,
+      id: new Date().toISOString(),
+    };
+
+    // Auto-save the contact immediately
+    setContacts((prev) => [newContact, ...prev]);
+
+    // Open the sheet for optional editing
+    setEditingContact(newContact);
     setIsSheetOpen(true);
+
+    toast({
+      title: '聯絡人已自動儲存',
+      description: '您可以選擇性地編輯詳細資訊。',
+    });
   };
   
 
