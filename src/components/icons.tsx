@@ -15,12 +15,11 @@ export const AppLogo = (props: SVGProps<SVGSVGElement>) => (
     strokeLinejoin="round"
     {...props}
   >
-    <path d="M4 4v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4" />
-    <path d="M4 10h16" />
-    <path d="M10 4v2" />
-    <path d="M14 4v2" />
-    <path d="M9 16h6" />
-    <path d="M9 13h6" />
+    <rect width="20" height="16" x="2" y="4" rx="2" />
+    <path d="M8 10h.01" />
+    <path d="M16 10h-4" />
+    <path d="M8 14h.01" />
+    <path d="M16 14h-4" />
   </svg>
 );
 
