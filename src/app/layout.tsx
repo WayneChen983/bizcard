@@ -67,6 +67,7 @@ export default function RootLayout({
       <head>
         <title>BizCard Pro</title>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body
         className={cn(
