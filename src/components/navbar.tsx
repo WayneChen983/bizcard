@@ -17,12 +17,12 @@ const navItems = [
   { href: '/settings/profile', label: '我的名片', icon: Icons.profile },
 ];
 
-export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<ScanCardDetailsOutput>) => void }) {
+export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => void }) {
   const pathname = usePathname();
   const { toast } = useToast();
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
 
-  const handleScan = (data: Partial<ScanCardDetailsOutput>) => {
+  const handleScan = (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
     onScanComplete(data);
     setIsScanDialogOpen(false);
   };

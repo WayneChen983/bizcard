@@ -18,7 +18,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 interface ScanCardDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onScanComplete: (data: Partial<ScanCardDetailsOutput>) => void;
+  onScanComplete: (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => void;
 }
 
 export function ScanCardDialog({
@@ -93,7 +93,7 @@ export function ScanCardDialog({
     // Run scan in the background
     scanCardDetails({ cardImageDataUri })
       .then(result => {
-        onScanComplete(result);
+        onScanComplete({ ...result, cardImageUrl: cardImageDataUri });
         toast({
           title: '掃描成功',
           description: '已填入聯絡人詳細資訊。',
@@ -248,5 +248,3 @@ export function ScanCardDialog({
     </Dialog>
   );
 }
-
-    

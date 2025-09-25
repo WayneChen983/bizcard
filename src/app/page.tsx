@@ -122,16 +122,16 @@ export default function Home() {
   const handleScanAndCreate = (scannedContact: Contact) => {
     const newContact: Contact = {
       ...scannedContact,
-      id: new Date().toISOString(),
+      id: scannedContact.id || new Date().toISOString(),
     };
-
+  
     // Auto-save the contact immediately
     setContacts((prev) => [newContact, ...prev]);
-
+  
     // Open the sheet for optional editing
     setEditingContact(newContact);
     setIsSheetOpen(true);
-
+  
     toast({
       title: '聯絡人已自動儲存',
       description: '您可以選擇性地編輯詳細資訊。',
@@ -149,7 +149,7 @@ export default function Home() {
     );
   }, [contacts, searchQuery]);
   
-  const isEditing = editingContact?.id && contacts.find(c => c.id === editingContact.id);
+  const isEditing = !!editingContact;
 
   return (
     <>
@@ -211,7 +211,7 @@ export default function Home() {
         }}>
         <SheetContent side="right" className="w-full max-w-md p-0">
           <ScrollArea className="h-full">
-            {isEditing && editingContact?.images?.[0] && (
+            {editingContact?.images?.[0] && (
               <div className="relative aspect-[16/10] w-full">
                 <Image
                   src={editingContact.images[0].url}

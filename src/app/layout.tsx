@@ -39,8 +39,8 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
 
-  const handleScanComplete = (scannedData: Partial<ScanCardDetailsOutput>) => {
-    const newContact: Contact = {
+  const handleScanComplete = (scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
+    const newContact: Partial<Contact> = {
       id: new Date().toISOString(),
       name: scannedData.name || '',
       company: scannedData.company || '',
@@ -53,7 +53,7 @@ export default function RootLayout({
       socialMedia: scannedData.socialMedia || '',
       other: scannedData.other || '',
       groups: [],
-      images: [],
+      images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
     };
     
     if (typeof window !== 'undefined') {
