@@ -1,6 +1,6 @@
 
 import { SVGProps } from 'react';
-import { LucideProps, Home, Camera, Settings, UserCircle } from 'lucide-react';
+import { LucideProps, Home, Camera, UserCircle } from 'lucide-react';
 
 export const AppLogo = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -32,6 +32,5 @@ export const Icons = {
         </svg>
     ),
     camera: Camera,
-    settings: Settings,
     profile: UserCircle,
 };

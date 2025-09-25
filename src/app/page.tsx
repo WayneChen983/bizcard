@@ -13,12 +13,19 @@ import {
   SheetTitle,
   SheetDescription,
 } from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { ContactForm } from '@/components/contact-form';
 import { ContactList } from '@/components/contact-list';
-import { Menu, Search } from 'lucide-react';
+import { Menu, Search, Palette, Globe, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
+import { useRouter } from 'next/navigation';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
@@ -30,6 +37,21 @@ export default function Home() {
   const [isSaving, setIsSaving] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const customEvent = event as CustomEvent<Contact>;
+      handleScanAndCreate(customEvent.detail);
+    };
+
+    window.addEventListener('scanComplete', handler);
+
+    return () => {
+      window.removeEventListener('scanComplete', handler);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     try {
@@ -78,7 +100,7 @@ export default function Home() {
     setIsSaving(true);
     // Simulate async save
     setTimeout(() => {
-      if (editingContact) {
+      if (editingContact && contacts.some(c => c.id === contact.id)) {
         setContacts((prev) =>
           prev.map((c) => (c.id === contact.id ? contact : c))
         );
@@ -111,6 +133,7 @@ export default function Home() {
     setEditingContact(newContact);
     setIsSheetOpen(true);
   };
+  
 
   const filteredContacts = useMemo(() => {
     if (!searchQuery) return contacts;
@@ -128,9 +151,27 @@ export default function Home() {
         <h1 className="font-headline text-xl font-bold tracking-tight text-foreground">
           名片列表
         </h1>
-        <Button size="icon" variant="ghost">
-          <Menu className="h-6 w-6" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="icon" variant="ghost">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => router.push('/settings/appearance')}>
+              <Palette className="mr-2 h-4 w-4" />
+              <span>外觀</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Globe className="mr-2 h-4 w-4" />
+              <span>語言</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Info className="mr-2 h-4 w-4" />
+              <span>關於</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </header>
 
       <main className="flex-1 overflow-hidden">

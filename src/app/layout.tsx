@@ -38,11 +38,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [editingContact, setEditingContact] = useState<Contact | null>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const handleScanAndCreate = (scannedData: Partial<ScanCardDetailsOutput>) => {
+  const handleScanComplete = (scannedData: Partial<ScanCardDetailsOutput>) => {
     const newContact: Contact = {
       id: new Date().toISOString(),
       name: scannedData.name || '',
@@ -59,10 +56,6 @@ export default function RootLayout({
       images: [],
     };
     
-    // This logic should ideally be lifted to a global state manager (like Context or Zustand)
-    // For now, we'll pass props down. This is a temporary solution.
-    // We are passing the scanned contact to the main page to handle it.
-    // A better way would be to use a global state.
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('scanComplete', { detail: newContact }));
     }
@@ -85,7 +78,7 @@ export default function RootLayout({
         <div className="relative flex h-screen w-full justify-center bg-background">
           <div className="relative flex h-full w-full max-w-md flex-col border-x">
             {children}
-            {pathname !== '/scan' && <Navbar onScanComplete={handleScanAndCreate} />}
+            {pathname !== '/scan' && <Navbar onScanComplete={handleScanComplete} />}
           </div>
         </div>
         <Toaster />

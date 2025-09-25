@@ -14,7 +14,7 @@ import { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 const navItems = [
   { href: '/', label: '名片列表', icon: Icons.home },
   { href: '/scan', label: '掃描', icon: Icons.camera, isCentral: true },
-  { href: '/settings', label: '設定', icon: Icons.settings },
+  { href: '/settings/profile', label: '我的名片', icon: Icons.profile },
 ];
 
 export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<ScanCardDetailsOutput>) => void }) {
