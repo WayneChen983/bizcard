@@ -43,26 +43,28 @@ const scanCardDetailsPrompt = ai.definePrompt({
   name: 'scanCardDetailsPrompt',
   input: {schema: ScanCardDetailsInputSchema},
   output: {schema: ScanCardDetailsOutputSchema},
-  prompt: `You are an AI assistant specialized in extracting contact information from business cards.
+  prompt: `You are a highly precise OCR assistant that extracts information from business cards.
 
-  Given an image of a business card, extract the following information:
-  - Name
-  - Company
-  - Job Title
-  - Phone Number
-  - Mobile Phone Number
-  - Email Address
-  - Website
-  - Address
-  - Social Media Links
-  - Other relevant information
+You are given an image of a business card and you must extract the contact details.
 
-  Here is the image of the business card: {{media url=cardImageDataUri}}
+**CRITICAL RULE: If a field is not present on the business card, you MUST return an empty string "" for that field. DO NOT HALLUCINATE, GUESS, or INVENT information. This is a strict requirement.**
 
-  Please provide the extracted information in a structured format.
-  If a field is not present on the business card, you MUST leave it as an empty string. Do not guess or make up information.
-  Do not add any extra information or conversation, only the data from the fields described in the schema.
-  `,
+Extract the following fields:
+- Name
+- Company
+- Job Title
+- Phone Number
+- Mobile Phone Number
+- Email Address
+- Website
+- Address
+- Social Media Links
+- Other relevant information
+
+Business Card Image: {{media url=cardImageDataUri}}
+
+Only return the structured data. Do not add any conversational text.
+`,
 });
 
 const scanCardDetailsFlow = ai.defineFlow(
