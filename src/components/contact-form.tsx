@@ -18,15 +18,8 @@ import { Textarea } from '@/components/ui/textarea';
 import type { Contact } from '@/lib/types';
 import { Loader2, Trash2, ScanLine } from 'lucide-react';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
 import { ScanCardDialog } from './scan-card-dialog';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: '姓名為必填欄位' }),
@@ -54,19 +47,35 @@ export function ContactForm({ contact, onSave, isSaving }: ContactFormProps) {
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: contact?.name || '',
-      company: contact?.company || '',
-      jobTitle: contact?.jobTitle || '',
-      phone: contact?.phone || '',
-      mobilePhone: contact?.mobilePhone || '',
-      email: contact?.email || '',
-      website: contact?.website || '',
-      address: contact?.address || '',
-      socialMedia: contact?.socialMedia || '',
-      other: contact?.other || '',
+    defaultValues: contact || {
+      name: '',
+      company: '',
+      jobTitle: '',
+      phone: '',
+      mobilePhone: '',
+      email: '',
+      website: '',
+      address: '',
+      socialMedia: '',
+      other: '',
     },
   });
+
+  useEffect(() => {
+    form.reset(contact || {
+      name: '',
+      company: '',
+      jobTitle: '',
+      phone: '',
+      mobilePhone: '',
+      email: '',
+      website: '',
+      address: '',
+      socialMedia: '',
+      other: '',
+    });
+  }, [contact, form]);
+
 
   function onSubmit(values: ContactFormValues) {
     const newContact: Contact = {
@@ -90,19 +99,23 @@ export function ContactForm({ contact, onSave, isSaving }: ContactFormProps) {
     form.reset(newValues);
   };
 
+  const isEditing = !!contact?.id;
+
   return (
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-1">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={() => setIsScanDialogOpen(true)}
-          >
-            <ScanLine className="mr-2 h-5 w-5" />
-            掃描名片自動填寫
-          </Button>
+          {!isEditing && (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => setIsScanDialogOpen(true)}
+            >
+              <ScanLine className="mr-2 h-5 w-5" />
+              掃描名片自動填寫
+            </Button>
+          )}
 
           <FormField
             control={form.control}

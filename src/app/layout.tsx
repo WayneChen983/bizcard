@@ -1,10 +1,16 @@
 
+'use client';
+
 import type { Metadata } from 'next';
 import { Inter, PT_Sans } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { Navbar } from '@/components/navbar';
+import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import type { Contact } from '@/lib/types';
+import { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -17,22 +23,56 @@ const fontHeadline = PT_Sans({
   variable: '--font-headline',
 });
 
-export const metadata: Metadata = {
-  title: 'BizCard Pro',
-  description: 'A smart business card manager.',
-  icons: {
-    icon: '/favicon.svg',
-  },
-};
+// This can't be set in metadata object because we are using 'use client'
+// export const metadata: Metadata = {
+//   title: 'BizCard Pro',
+//   description: 'A smart business card manager.',
+//   icons: {
+//     icon: '/favicon.svg',
+//   },
+// };
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const handleScanAndCreate = (scannedData: Partial<ScanCardDetailsOutput>) => {
+    const newContact: Contact = {
+      id: new Date().toISOString(),
+      name: scannedData.name || '',
+      company: scannedData.company || '',
+      jobTitle: scannedData.jobTitle || '',
+      phone: scannedData.phone || '',
+      mobilePhone: scannedData.mobilePhone || '',
+      email: scannedData.email || '',
+      website: scannedData.website || '',
+      address: scannedData.address || '',
+      socialMedia: scannedData.socialMedia || '',
+      other: scannedData.other || '',
+      groups: [],
+      images: [],
+    };
+    
+    // This logic should ideally be lifted to a global state manager (like Context or Zustand)
+    // For now, we'll pass props down. This is a temporary solution.
+    // We are passing the scanned contact to the main page to handle it.
+    // A better way would be to use a global state.
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('scanComplete', { detail: newContact }));
+    }
+  };
+
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <title>BizCard Pro</title>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body
@@ -45,7 +85,7 @@ export default function RootLayout({
         <div className="relative flex h-screen w-full justify-center bg-background">
           <div className="relative flex h-full w-full max-w-md flex-col border-x">
             {children}
-            <Navbar />
+            {pathname !== '/scan' && <Navbar onScanComplete={handleScanAndCreate} />}
           </div>
         </div>
         <Toaster />

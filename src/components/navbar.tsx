@@ -17,18 +17,13 @@ const navItems = [
   { href: '/settings', label: '設定', icon: Icons.settings },
 ];
 
-export function Navbar() {
+export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<ScanCardDetailsOutput>) => void }) {
   const pathname = usePathname();
   const { toast } = useToast();
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
 
-  const handleScanComplete = (data: Partial<ScanCardDetailsOutput>) => {
-    // For now, just show a toast. In a real app, you'd handle the data.
-    toast({
-      title: '掃描成功',
-      description: '聯絡人資訊已擷取。',
-    });
-    console.log('Scanned data:', data);
+  const handleScan = (data: Partial<ScanCardDetailsOutput>) => {
+    onScanComplete(data);
     setIsScanDialogOpen(false);
   };
   
@@ -71,7 +66,7 @@ export function Navbar() {
       <ScanCardDialog
         open={isScanDialogOpen}
         onOpenChange={setIsScanDialogOpen}
-        onScanComplete={handleScanComplete}
+        onScanComplete={handleScan}
       />
     </>
   );

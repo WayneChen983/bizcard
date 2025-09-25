@@ -18,6 +18,7 @@ import { ContactList } from '@/components/contact-list';
 import { Menu, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
@@ -91,6 +92,26 @@ export default function Home() {
     }, 500);
   };
 
+  const handleScanAndCreate = (scannedData: Partial<ScanCardDetailsOutput>) => {
+    const newContact: Contact = {
+      id: new Date().toISOString(),
+      name: scannedData.name || '',
+      company: scannedData.company || '',
+      jobTitle: scannedData.jobTitle || '',
+      phone: scannedData.phone || '',
+      mobilePhone: scannedData.mobilePhone || '',
+      email: scannedData.email || '',
+      website: scannedData.website || '',
+      address: scannedData.address || '',
+      socialMedia: scannedData.socialMedia || '',
+      other: scannedData.other || '',
+      groups: [],
+      images: [],
+    };
+    setEditingContact(newContact);
+    setIsSheetOpen(true);
+  };
+
   const filteredContacts = useMemo(() => {
     if (!searchQuery) return contacts;
     return contacts.filter(
@@ -140,10 +161,10 @@ export default function Home() {
           <ScrollArea className="h-full">
             <SheetHeader className="p-6">
               <SheetTitle className="font-headline text-2xl">
-                {editingContact ? '編輯聯絡人' : '新增聯絡人'}
+                {editingContact?.id && contacts.find(c => c.id === editingContact.id) ? '編輯聯絡人' : '新增聯絡人'}
               </SheetTitle>
               <SheetDescription>
-                {editingContact
+                {editingContact?.id && contacts.find(c => c.id === editingContact.id)
                   ? '更新此聯絡人的詳細資訊。'
                   : '將新聯絡人新增至您的清單。試試掃描名片！'}
               </SheetDescription>
