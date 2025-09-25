@@ -85,13 +85,23 @@ const ProfilePage = () => {
   };
 
   const handleScanComplete = (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
-    if (data.cardImageUrl && userContact) {
-      const updatedContact: Contact = {
-        ...userContact,
-        images: [{ url: data.cardImageUrl, alt: "Business card" }, ...(userContact.images?.slice(1) || [])]
-      };
+    if (userContact) {
+      const updatedContact: Contact = { ...userContact };
+
+      // Update image
+      if (data.cardImageUrl) {
+        updatedContact.images = [{ url: data.cardImageUrl, alt: "Business card" }, ...(userContact.images?.slice(1) || [])];
+      }
+
+      // Update fields from scan result
+      Object.keys(data).forEach(key => {
+        if (key !== 'cardImageUrl' && data[key as keyof ScanCardDetailsOutput]) {
+          (updatedContact as any)[key] = data[key as keyof ScanCardDetailsOutput];
+        }
+      });
+      
       setUserContact(updatedContact);
-      toast({ title: "名片照片已更新", description: "按下儲存以保存變更" });
+      toast({ title: "名片已更新", description: "AI已自動填入新資訊，請確認後儲存。" });
     }
   };
   
