@@ -30,7 +30,7 @@ const ProfilePage = () => {
     { icon: GlobeIcon, label: '網站', value: userContact.website },
     { icon: Building, label: '公司', value: userContact.company },
     { icon: MapPin, label: '地址', value: userContact.address },
-    { icon: MessageSquare, label: 'LINE', value: userContact.socialMedia },
+    { icon: MessageSquare, label: '社群媒體', value: userContact.socialMedia },
     { icon: Info, label: '備註', value: userContact.other },
   ];
 

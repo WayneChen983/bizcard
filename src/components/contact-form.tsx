@@ -184,27 +184,12 @@ export function ContactForm({ contact, onSave, isSaving }: ContactFormProps) {
               </FormItem>
             )}
           />
-
-          <h3 className="font-semibold">社群媒體</h3>
-          <FormField
-            control={form.control}
-            name="socialMedia"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>LINE</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
            <FormField
             control={form.control}
             name="website"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>LinkedIn</FormLabel>
+                <FormLabel>網站</FormLabel>
                 <FormControl>
                    <Input {...field} />
                 </FormControl>
@@ -212,9 +197,21 @@ export function ContactForm({ contact, onSave, isSaving }: ContactFormProps) {
               </FormItem>
             )}
           />
-         
 
-          <h3 className="font-semibold">公司資訊</h3>
+          <h3 className="font-semibold">其他</h3>
+          <FormField
+            control={form.control}
+            name="socialMedia"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>社群媒體</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
            <FormField
             control={form.control}
             name="address"
