@@ -86,19 +86,27 @@ const ProfilePage = () => {
 
   const handleScanComplete = (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
     if (userContact) {
-      const updatedContact: Contact = { ...userContact };
-
+      // Create a fresh contact object, preserving only the ID and groups.
+      const updatedContact: Contact = {
+        id: userContact.id,
+        name: data.name || '',
+        company: data.company || '',
+        jobTitle: data.jobTitle || '',
+        phone: data.phone || '',
+        mobilePhone: data.mobilePhone || '',
+        email: data.email || '',
+        website: data.website || '',
+        address: data.address || '',
+        socialMedia: data.socialMedia || '',
+        other: data.other || '',
+        groups: userContact.groups, // Preserve existing groups
+        images: userContact.images || [], // Start with existing images
+      };
+      
       // Update image
       if (data.cardImageUrl) {
         updatedContact.images = [{ url: data.cardImageUrl, alt: "Business card" }, ...(userContact.images?.slice(1) || [])];
       }
-
-      // Update fields from scan result
-      Object.keys(data).forEach(key => {
-        if (key !== 'cardImageUrl' && data[key as keyof ScanCardDetailsOutput]) {
-          (updatedContact as any)[key] = data[key as keyof ScanCardDetailsOutput];
-        }
-      });
       
       setUserContact(updatedContact);
       toast({ title: "名片已更新", description: "AI已自動填入新資訊，請確認後儲存。" });
