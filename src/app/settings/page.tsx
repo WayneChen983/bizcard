@@ -27,11 +27,10 @@ const SettingsPage = () => {
   const settingsOptions = [
     {
       icon: User,
-      text: '個人檔案',
+      text: '我的名片',
       action: () => router.push('/settings/profile'),
     },
-    { icon: Bell, text: '通知', action: () => {} },
-    { icon: Palette, text: '外觀', action: () => {} },
+    { icon: Palette, text: '外觀', action: () => router.push('/settings/appearance') },
     { icon: Globe, text: '語言', action: () => {} },
     { icon: Info, text: '關於', action: () => {} },
   ];

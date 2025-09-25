@@ -41,7 +41,7 @@ const ProfilePage = () => {
           <ChevronLeft className="h-6 w-6" />
         </Button>
         <h1 className="mx-auto font-headline text-xl font-bold tracking-tight text-foreground">
-          個人檔案
+          我的名片
         </h1>
         <div className="w-10"></div>
       </header>
