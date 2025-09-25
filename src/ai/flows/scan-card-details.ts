@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -59,7 +60,7 @@ const scanCardDetailsPrompt = ai.definePrompt({
   Here is the image of the business card: {{media url=cardImageDataUri}}
 
   Please provide the extracted information in a structured format.
-  Consider that some fields might not be present on the card, in that case, leave those fields blank.
+  If a field is not present on the business card, you MUST leave it as an empty string. Do not guess or make up information.
   Do not add any extra information or conversation, only the data from the fields described in the schema.
   `,
 });
