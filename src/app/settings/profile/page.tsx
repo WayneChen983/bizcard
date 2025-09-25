@@ -17,6 +17,7 @@ import {
   MessageSquare,
   Info,
   Pencil,
+  Camera,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -31,6 +32,8 @@ import {
 import { ContactForm } from '@/components/contact-form';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { ScanCardDialog } from '@/components/scan-card-dialog';
+import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
@@ -40,6 +43,7 @@ const ProfilePage = () => {
   const [userContact, setUserContact] = useState<Contact | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -78,6 +82,17 @@ const ProfilePage = () => {
         setIsSheetOpen(false);
       }
     }, 500);
+  };
+
+  const handleScanComplete = (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
+    if (data.cardImageUrl && userContact) {
+      const updatedContact: Contact = {
+        ...userContact,
+        images: [{ url: data.cardImageUrl, alt: "Business card" }, ...(userContact.images?.slice(1) || [])]
+      };
+      setUserContact(updatedContact);
+      toast({ title: "名片照片已更新", description: "按下儲存以保存變更" });
+    }
   };
   
   const infoItems = userContact ? [
@@ -163,9 +178,14 @@ const ProfilePage = () => {
               </div>
             )}
             <SheetHeader className="p-6">
-              <SheetTitle className="font-headline text-2xl">
-                編輯我的名片
-              </SheetTitle>
+              <div className="flex items-center justify-between">
+                <SheetTitle className="font-headline text-2xl">
+                  編輯我的名片
+                </SheetTitle>
+                <Button variant="outline" size="icon" onClick={() => setIsScanDialogOpen(true)}>
+                  <Camera className="h-5 w-5" />
+                </Button>
+              </div>
               <SheetDescription>
                 更新您的個人名片資訊。
               </SheetDescription>
@@ -180,8 +200,15 @@ const ProfilePage = () => {
           </ScrollArea>
         </SheetContent>
       </Sheet>
+       <ScanCardDialog
+        open={isScanDialogOpen}
+        onOpenChange={setIsScanDialogOpen}
+        onScanComplete={handleScanComplete}
+      />
     </>
   );
-};
+}
 
 export default ProfilePage;
+
+    
