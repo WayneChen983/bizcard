@@ -24,7 +24,6 @@ import { ContactList } from '@/components/contact-list';
 import { Menu, Search, Palette, Globe, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 import { useRouter } from 'next/navigation';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
@@ -94,6 +93,8 @@ export default function Home() {
       title: '聯絡人已刪除',
       description: '聯絡人已成功移除',
     });
+    setIsSheetOpen(false);
+    setEditingContact(null);
   };
 
   const handleSave = (contact: Contact) => {
@@ -206,6 +207,7 @@ export default function Home() {
               <ContactForm
                 contact={editingContact}
                 onSave={handleSave}
+                onDelete={handleDelete}
                 isSaving={isSaving}
               />
             </div>

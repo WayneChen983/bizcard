@@ -20,6 +20,17 @@ import { Loader2, Trash2, ScanLine } from 'lucide-react';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 import { ScanCardDialog } from './scan-card-dialog';
 import { useState, useEffect } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const formSchema = z.object({
   name: z.string().min(1, { message: '姓名為必填欄位' }),
@@ -39,10 +50,11 @@ type ContactFormValues = z.infer<typeof formSchema>;
 interface ContactFormProps {
   contact?: Contact | null;
   onSave: (contact: Contact) => void;
+  onDelete?: (id: string) => void;
   isSaving: boolean;
 }
 
-export function ContactForm({ contact, onSave, isSaving }: ContactFormProps) {
+export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactFormProps) {
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
 
   const form = useForm<ContactFormValues>({
@@ -98,6 +110,12 @@ export function ContactForm({ contact, onSave, isSaving }: ContactFormProps) {
     }
     form.reset(newValues);
   };
+
+  const handleDelete = () => {
+    if (contact && onDelete) {
+      onDelete(contact.id);
+    }
+  }
 
   const isEditing = !!contact?.id;
 
@@ -240,10 +258,26 @@ export function ContactForm({ contact, onSave, isSaving }: ContactFormProps) {
           />
 
           <div className="flex justify-between gap-2 pt-4">
-             {contact && (
-                 <Button type="button" variant="destructive" size="icon">
-                    <Trash2 className="h-4 w-4" />
-                </Button>
+             {contact && onDelete && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type="button" variant="destructive" size="icon">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>確定要刪除嗎？</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        此操作無法復原。這將永久刪除此聯絡人。
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>取消</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>刪除</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
             )}
             <Button type="submit" className="w-full" disabled={isSaving}>
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
