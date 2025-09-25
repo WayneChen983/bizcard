@@ -1,11 +1,11 @@
 {
-  "name": "名片掃描 PRO",
-  "short_name": "名片 PRO",
-  "description": "您的智慧名片管理助理",
+  "name": "BizCard Pro",
+  "short_name": "BizCardPro",
+  "description": "A smart business card manager.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#F9A825",
+  "theme_color": "#FF9800",
   "icons": [
     {
       "src": "/icon-512x512.png",
