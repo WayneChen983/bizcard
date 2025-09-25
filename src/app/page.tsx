@@ -106,31 +106,18 @@ export default function Home() {
         );
         toast({ title: '聯絡人已更新' });
       } else {
-        setContacts((prev) => [{ ...contact, images: [] }, ...prev]);
+        // This handles both new contacts created via scanning and manually
+        setContacts((prev) => [{ ...contact, images: contact.images || [] }, ...prev]);
         toast({ title: '聯絡人已新增' });
       }
       setIsSaving(false);
       setIsSheetOpen(false);
+      setEditingContact(null);
     }, 500);
   };
 
-  const handleScanAndCreate = (scannedData: Partial<ScanCardDetailsOutput>) => {
-    const newContact: Contact = {
-      id: new Date().toISOString(),
-      name: scannedData.name || '',
-      company: scannedData.company || '',
-      jobTitle: scannedData.jobTitle || '',
-      phone: scannedData.phone || '',
-      mobilePhone: scannedData.mobilePhone || '',
-      email: scannedData.email || '',
-      website: scannedData.website || '',
-      address: scannedData.address || '',
-      socialMedia: scannedData.socialMedia || '',
-      other: scannedData.other || '',
-      groups: [],
-      images: [],
-    };
-    setEditingContact(newContact);
+  const handleScanAndCreate = (scannedContact: Contact) => {
+    setEditingContact(scannedContact);
     setIsSheetOpen(true);
   };
   
@@ -197,7 +184,12 @@ export default function Home() {
         </ScrollArea>
       </main>
 
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+      <Sheet open={isSheetOpen} onOpenChange={(isOpen) => {
+          setIsSheetOpen(isOpen);
+          if (!isOpen) {
+            setEditingContact(null);
+          }
+        }}>
         <SheetContent side="right" className="w-full max-w-md p-0">
           <ScrollArea className="h-full">
             <SheetHeader className="p-6">
