@@ -90,11 +90,19 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
 
 
   function onSubmit(values: ContactFormValues) {
+    let images = contact?.images || [];
+
+    // If a new image was scanned (passed via contact prop but not yet saved)
+    // and it's not already in the images array, add it.
+    if (contact?.images?.[0] && !images.some(img => img.url === contact.images?.[0].url)) {
+      images = [...contact.images, ...images];
+    }
+    
     const newContact: Contact = {
-      id: contact?.id || new Date().toISOString(),
+      id: contact?.id || '',
       ...values,
       groups: contact?.groups || [],
-      images: contact?.images || [],
+      images: images,
     };
     onSave(newContact);
   }
@@ -134,7 +142,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
               掃描名片自動填寫
             </Button>
           )}
-
+          
           <FormField
             control={form.control}
             name="name"
@@ -175,7 +183,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             )}
           />
 
-          <h3 className="font-semibold">聯絡資訊</h3>
+          <h3 className="font-semibold pt-2 border-t">聯絡資訊</h3>
           <FormField
             control={form.control}
             name="mobilePhone"
@@ -216,7 +224,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             )}
           />
 
-          <h3 className="font-semibold">其他</h3>
+          <h3 className="font-semibold pt-2 border-t">其他</h3>
           <FormField
             control={form.control}
             name="socialMedia"
@@ -258,7 +266,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
           />
 
           <div className="flex justify-between gap-2 pt-4">
-             {contact && onDelete && (
+             {contact && onDelete && isEditing && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button type="button" variant="destructive" size="icon">

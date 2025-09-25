@@ -25,6 +25,7 @@ import { Menu, Search, Palette, Globe, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
@@ -108,7 +109,8 @@ export default function Home() {
         toast({ title: '聯絡人已更新' });
       } else {
         // This handles both new contacts created via scanning and manually
-        setContacts((prev) => [{ ...contact, images: contact.images || [] }, ...prev]);
+        const newContact = { ...contact, id: contact.id || new Date().toISOString() };
+        setContacts((prev) => [newContact, ...prev]);
         toast({ title: '聯絡人已新增' });
       }
       setIsSaving(false);
@@ -132,6 +134,8 @@ export default function Home() {
         contact.email?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [contacts, searchQuery]);
+  
+  const isEditing = editingContact?.id && contacts.find(c => c.id === editingContact.id);
 
   return (
     <>
@@ -193,12 +197,22 @@ export default function Home() {
         }}>
         <SheetContent side="right" className="w-full max-w-md p-0">
           <ScrollArea className="h-full">
+            {isEditing && editingContact?.images?.[0] && (
+              <div className="relative aspect-[16/10] w-full">
+                <Image
+                  src={editingContact.images[0].url}
+                  alt={editingContact.images[0].alt || "Business card"}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            )}
             <SheetHeader className="p-6">
               <SheetTitle className="font-headline text-2xl">
-                {editingContact?.id && contacts.find(c => c.id === editingContact.id) ? '編輯聯絡人' : '新增聯絡人'}
+                {isEditing ? '編輯聯絡人' : '新增聯絡人'}
               </SheetTitle>
               <SheetDescription>
-                {editingContact?.id && contacts.find(c => c.id === editingContact.id)
+                {isEditing
                   ? '更新此聯絡人的詳細資訊。'
                   : '將新聯絡人新增至您的清單。試試掃描名片！'}
               </SheetDescription>
