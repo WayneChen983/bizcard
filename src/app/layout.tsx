@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import type { Metadata } from 'next';
 import { Inter, PT_Sans } from 'next/font/google';
 import './globals.css';
+import 'react-image-crop/dist/ReactCrop.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { LanguageProvider } from '@/context/language-context';

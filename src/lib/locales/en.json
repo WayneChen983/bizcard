@@ -83,5 +83,7 @@
   "sort_zhuyin": "Zhuyin",
   "sort_gojuon": "Gojuon",
   "sort_ganada": "Ganada",
-  "sort_cyrillic": "Cyrillic (А-Я)"
+  "sort_cyrillic": "Cyrillic (А-Я)",
+  "crop_instruction": "Crop Card",
+  "crop_and_use_button": "Crop & Use"
 }

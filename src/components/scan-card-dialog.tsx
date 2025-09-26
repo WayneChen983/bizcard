@@ -12,14 +12,35 @@ import {
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { scanCardDetails, ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
-import { Loader2, Camera as CameraIcon, X, Zap, ZapOff, Image as ImageIcon, Check, ArrowLeft } from 'lucide-react';
+import { Loader2, Camera as CameraIcon, X, Zap, ZapOff, Image as ImageIcon, Check, ArrowLeft, Crop } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLanguage } from '@/context/language-context';
+import ReactCrop, { type Crop as CropType, centerCrop, makeAspectCrop } from 'react-image-crop';
 
 interface ScanCardDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onScanComplete: (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => void;
+}
+
+function centerAspectCrop(
+  mediaWidth: number,
+  mediaHeight: number,
+  aspect: number,
+) {
+  return centerCrop(
+    makeAspectCrop(
+      {
+        unit: '%',
+        width: 90,
+      },
+      aspect,
+      mediaWidth,
+      mediaHeight,
+    ),
+    mediaWidth,
+    mediaHeight,
+  )
 }
 
 export function ScanCardDialog({
@@ -33,8 +54,12 @@ export function ScanCardDialog({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
+  const [crop, setCrop] = useState<CropType>();
+  const [completedCrop, setCompletedCrop] = useState<CropType>();
+  const [aspect, setAspect] = useState<number | undefined>(16 / 9);
 
   const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
@@ -46,6 +71,8 @@ export function ScanCardDialog({
 
   const setupCamera = async () => {
     setImage(null);
+    setCrop(undefined);
+    setCompletedCrop(undefined);
     stopCamera();
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
@@ -110,16 +137,69 @@ export function ScanCardDialog({
       });
   };
 
-  const confirmAndScan = () => {
-    if (image) {
-      handleScan(image);
-       // Save image to device
-       const link = document.createElement('a');
-       link.href = image;
-       link.download = `bizcard-${new Date().toISOString()}.png`;
-       document.body.appendChild(link);
-       link.click();
-       document.body.removeChild(link);
+  function getCroppedImg(
+    image: HTMLImageElement,
+    crop: CropType,
+    fileName: string,
+  ): Promise<string> {
+    const canvas = document.createElement('canvas');
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    canvas.width = crop.width * scaleX;
+    canvas.height = crop.height * scaleY;
+    const ctx = canvas.getContext('2d');
+  
+    if (!ctx) {
+      return Promise.reject(new Error('Canvas context is not available'));
+    }
+  
+    ctx.drawImage(
+      image,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    return new Promise((resolve, reject) => {
+        const dataUrl = canvas.toDataURL('image/png');
+        resolve(dataUrl);
+    });
+  }
+
+  const confirmAndScan = async () => {
+    if (completedCrop && imgRef.current) {
+        try {
+            const croppedImageDataUrl = await getCroppedImg(
+                imgRef.current,
+                completedCrop,
+                'cropped-card.png'
+            );
+            handleScan(croppedImageDataUrl);
+            
+            // Save image to device
+            const link = document.createElement('a');
+            link.href = croppedImageDataUrl;
+            link.download = `bizcard-cropped-${new Date().toISOString()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+        } catch (e) {
+            console.error(e);
+            toast({
+              title: t('scan_failed_toast_title'),
+              description: 'Could not crop the image.',
+              variant: 'destructive',
+            });
+        }
+    } else if (image) {
+        // Fallback to scanning the original image if no crop is made
+        handleScan(image);
     }
   }
 
@@ -128,18 +208,10 @@ export function ScanCardDialog({
       const context = canvasRef.current.getContext('2d');
       if (context) {
         const video = videoRef.current;
-        const videoWidth = video.videoWidth;
-        const videoHeight = video.videoHeight;
+        canvasRef.current.width = video.videoWidth;
+        canvasRef.current.height = video.videoHeight;
   
-        const sx = videoWidth * 0.05;
-        const sy = videoHeight * 0.25;
-        const sWidth = videoWidth * 0.9;
-        const sHeight = videoHeight * 0.5;
-  
-        canvasRef.current.width = sWidth;
-        canvasRef.current.height = sHeight;
-  
-        context.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
+        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
         
         const dataUrl = canvasRef.current.toDataURL('image/png');
         setImage(dataUrl);
@@ -154,11 +226,17 @@ export function ScanCardDialog({
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
-        handleScan(result);
+        setImage(result);
+        stopCamera();
       };
       reader.readAsDataURL(selectedFile);
     }
   };
+
+  function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+    const { width, height } = e.currentTarget
+    setCrop(centerAspectCrop(width, height, 1.7))
+  }
 
   const toggleFlash = async () => {
     if (videoRef.current?.srcObject) {
@@ -186,7 +264,7 @@ export function ScanCardDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md w-full h-screen flex flex-col p-0 gap-0 bg-black text-white">
         <DialogHeader className="p-4 flex flex-row items-center justify-between border-b border-gray-700 z-10 bg-black">
-          <DialogTitle className='font-headline text-white'>{t('scan_card_dialog_title')}</DialogTitle>
+          <DialogTitle className='font-headline text-white'>{image ? t('crop_instruction') || 'Crop Card' : t('scan_card_dialog_title')}</DialogTitle>
           <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
             <X className="h-6 w-6 text-white" />
           </Button>
@@ -194,13 +272,27 @@ export function ScanCardDialog({
 
         <div className="flex-1 bg-black flex items-center justify-center relative">
           {image ? (
-            <Image src={image} alt="Captured business card" layout="fill" objectFit="contain" />
+            <ReactCrop
+              crop={crop}
+              onChange={(_, percentCrop) => setCrop(percentCrop)}
+              onComplete={(c) => setCompletedCrop(c)}
+              aspect={aspect}
+              className="max-h-full"
+            >
+              <img
+                ref={imgRef}
+                alt="Crop me"
+                src={image}
+                onLoad={onImageLoad}
+                className="max-h-[70vh] object-contain"
+              />
+            </ReactCrop>
           ) : (
             <>
               <video ref={videoRef} className="w-full h-full object-cover" playsInline autoPlay muted />
               {hasCameraPermission ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <div className="w-[90%] h-[50%] border-4 border-white/80 rounded-2xl shadow-lg bg-black/20" />
+                  <div className="w-[90%] h-[50%] border-4 border-dashed border-white/80 rounded-2xl shadow-lg bg-black/20" />
                   <p className="absolute top-1/4 left-1/2 -translate-x-1/2 text-white/90 bg-black/50 px-4 py-2 rounded-md text-center">
                     {t('scan_card_instruction')}
                   </p>
@@ -228,8 +320,8 @@ export function ScanCardDialog({
                 {t('retake_button')}
               </Button>
               <Button onClick={confirmAndScan} className="bg-primary text-primary-foreground">
-                <Check className="mr-2 h-5 w-5" />
-                {t('use_photo_button')}
+                <Crop className="mr-2 h-5 w-5" />
+                {t('crop_and_use_button') || 'Crop & Use'}
               </Button>
             </>
           ) : (

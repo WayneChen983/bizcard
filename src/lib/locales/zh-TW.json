@@ -52,7 +52,7 @@
   "scan_failed_toast_title": "掃描失敗",
   "scan_failed_toast_desc": "無法從卡片中提取詳細資訊。請重試或手動輸入。",
   "flash_error_title": "閃光燈錯誤",
-  "flash_error_desc": "無法控制閃光燈。",
+  "flash_error_desc": "無法控制閃光灯。",
   "flash_not_supported_title": "不支援閃光燈",
   "flash_not_supported_desc": "您的裝置不支援閃光燈。",
   "retake_button": "重新拍攝",
@@ -83,5 +83,7 @@
   "sort_zhuyin": "按注音排序",
   "sort_gojuon": "按五十音排序",
   "sort_ganada": "按가나다排序",
-  "sort_cyrillic": "按西里爾字母排序 (А-Я)"
+  "sort_cyrillic": "按西里爾字母排序 (А-Я)",
+  "crop_instruction": "裁剪名片",
+  "crop_and_use_button": "裁剪並使用"
 }
