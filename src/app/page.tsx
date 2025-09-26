@@ -13,27 +13,13 @@ import {
   SheetTitle,
   SheetDescription,
 } from '@/components/ui/sheet';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuPortal,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-} from '@/components/ui/dropdown-menu';
 import { ContactForm } from '@/components/contact-form';
 import { ContactList } from '@/components/contact-list';
-import { Menu, Search, Palette, Globe, Info, Check } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useLanguage } from '@/context/language-context';
-import type { Language, LanguageDefinition } from '@/lib/i18n';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
@@ -45,8 +31,7 @@ export default function Home() {
   const [isSaving, setIsSaving] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const { toast } = useToast();
-  const router = useRouter();
-  const { t, setLanguage, language, languages } = useLanguage();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handler = (event: Event) => {
@@ -166,40 +151,8 @@ export default function Home() {
         <h1 className="font-headline text-xl font-bold tracking-tight text-foreground">
           {t('contact_list_title')}
         </h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="ghost">
-              <Menu className="h-6 w-6" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => router.push('/settings/appearance')}>
-              <Palette className="mr-2 h-4 w-4" />
-              <span>{t('appearance_title')}</span>
-            </DropdownMenuItem>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Globe className="mr-2 h-4 w-4" />
-                <span>{t('language_title')}</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  <DropdownMenuRadioGroup value={language} onValueChange={(value) => setLanguage(value as Language)}>
-                    {Object.values(languages).map((lang: LanguageDefinition) => (
-                      <DropdownMenuRadioItem key={lang.code} value={lang.code}>
-                        {lang.name}
-                      </DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-            <DropdownMenuItem>
-              <Info className="mr-2 h-4 w-4" />
-              <span>{t('about_title')}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Placeholder for potential future actions */}
+        <div className="w-10"></div>
       </header>
 
       <main className="flex-1 overflow-hidden">

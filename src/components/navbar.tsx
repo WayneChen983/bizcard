@@ -15,13 +15,12 @@ import { useLanguage } from '@/context/language-context';
 export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => void }) {
   const pathname = usePathname();
   const { t } = useLanguage();
-  const { toast } = useToast();
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
 
   const navItems = [
     { href: '/', label: t('nav_contacts'), icon: Icons.home },
     { href: '/scan', label: t('nav_scan'), icon: Icons.camera, isCentral: true },
-    { href: '/settings/profile', label: t('nav_my_card'), icon: Icons.profile },
+    { href: '/settings', label: t('nav_settings'), icon: Icons.settings },
   ];
 
   const handleScan = (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
@@ -29,7 +28,7 @@ export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<Scan
     setIsScanDialogOpen(false);
   };
   
-  const isProfilePage = pathname === '/settings/profile';
+  const isSettingsPage = pathname.startsWith('/settings');
 
   return (
     <>
@@ -45,10 +44,10 @@ export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<Scan
                     size="icon"
                     className={cn(
                       "h-16 w-16 rounded-full shadow-lg transition-transform duration-300 ease-in-out",
-                      isProfilePage ? "translate-y-24" : "-translate-y-6"
+                      isSettingsPage ? "translate-y-24" : "-translate-y-6"
                     )}
                     onClick={() => setIsScanDialogOpen(true)}
-                    tabIndex={isProfilePage ? -1 : 0}
+                    tabIndex={isSettingsPage ? -1 : 0}
                     aria-label={item.label}
                   >
                     <item.icon className="h-8 w-8" />
@@ -61,7 +60,7 @@ export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<Scan
                 <div
                   className={cn(
                     'flex flex-col items-center gap-1 p-2 text-muted-foreground transition-colors',
-                    isActive && 'text-primary'
+                    (isActive || (item.href === '/settings' && isSettingsPage)) && 'text-primary'
                   )}
                 >
                   <item.icon className="h-6 w-6" />

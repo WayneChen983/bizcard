@@ -61,6 +61,9 @@ export default function RootLayout({
     }
   };
 
+  const pagesWithoutNavbar = ['/scan', '/settings', '/settings/appearance', '/settings/language', '/settings/profile'];
+  const showNavbar = !pagesWithoutNavbar.includes(pathname);
+
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -80,7 +83,7 @@ export default function RootLayout({
           <div className="relative flex h-screen w-full justify-center bg-background">
             <div className="relative flex h-full w-full max-w-md flex-col border-x">
               {children}
-              {pathname !== '/scan' && <Navbar onScanComplete={handleScanComplete} />}
+              {showNavbar && <Navbar onScanComplete={handleScanComplete} />}
             </div>
           </div>
           <Toaster />

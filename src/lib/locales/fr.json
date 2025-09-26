@@ -40,6 +40,7 @@
   "nav_contacts": "Contacts",
   "nav_scan": "Scanner",
   "nav_my_card": "Ma Carte",
+  "nav_settings": "Paramètres",
   "scan_card_dialog_title": "Scanner la carte de visite",
   "scan_card_instruction": "Alignez la carte de visite dans le cadre",
   "camera_permission_denied_title": "Autorisation de caméra refusée",
@@ -70,5 +71,6 @@
   "edit_my_card_desc": "Mettez à jour les informations de votre carte de visite personnelle.",
   "profile_updated_toast_title": "Profil mis à jour",
   "profile_updated_ai_toast_desc": "L'IA a rempli les nouvelles informations. Veuillez vérifier et enregistrer.",
-  "save_failed_toast_title": "Échec de l'enregistrement"
+  "save_failed_toast_title": "Échec de l'enregistrement",
+  "settings_title": "Paramètres"
 }
