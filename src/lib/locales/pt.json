@@ -52,7 +52,7 @@
   "scan_success_toast_title": "Escaneamento bem-sucedido",
   "scan_success_toast_desc": "Os detalhes do contato foram preenchidos.",
   "scan_failed_toast_title": "Falha no Escaneamento",
-  "scan_failed_toast_desc": "Não foi possível extrair os detalhes do cartão. Por favor, tente novamente ou insira manualmente.",
+  "scan_failed_toast_desc": "Não foi possível extrair os detalhes do cartão. Por favor, tente novamente ou insira manually.",
   "flash_error_title": "Erro no Flash",
   "flash_error_desc": "Não foi possível controlar a lanterna.",
   "flash_not_supported_title": "Flash não suportado",
@@ -93,9 +93,12 @@
   "privacy_policy_section3_title": "Como Usamos as Suas Informações",
   "privacy_policy_section3_content": "Utilizamos as informações armazenadas no seu dispositivo exclusivamente para fornecer e melhorar a funcionalidade da aplicação. Não temos acesso a estas informações.",
   "privacy_policy_section4_title": "Partilha de Informações",
-  "privacy_policy_section4_content": "Não partilhamos as suas informações pessoais com terceiros, uma vez que не as recolhemos.",
+  "privacy_policy_section4_content": "Não partilhamos as suas informações pessoais com terceiros, uma vez que não as recolhemos.",
   "privacy_policy_section5_title": "Segurança dos Dados",
   "privacy_policy_section5_content": "A segurança dos seus dados depende da segurança do seu dispositivo. Recomendamos que utilize as funcionalidades de segurança do seu dispositivo para proteger os seus dados.",
   "privacy_policy_section6_title": "Alterações a esta Política",
-  "privacy_policy_section6_content": "Podemos atualizar esta Política de Privacidade de tempos a tempos. Iremos notificá-lo de quaisquer alterações publicando a nova Política de Privacidade na aplicação."
+  "privacy_policy_section6_content": "Podemos atualizar esta Política de Privacidade de tempos a tempos. Iremos notificá-lo de quaisquer alterações publicando a nova Política de Privacidade na aplicação.",
+  "about_version": "Versão",
+  "about_developer_title": "Informações do Desenvolvedor",
+  "about_rights_reserved": "Todos os direitos reservados."
 }

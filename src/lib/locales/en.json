@@ -102,5 +102,8 @@
   "privacy_policy_section5_title": "Data Security",
   "privacy_policy_section5_content": "Your data's security is dependent on the security of your device. We recommend using your device's security features to protect your data.",
   "privacy_policy_section6_title": "Changes to This Policy",
-  "privacy_policy_section6_content": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy in the app."
+  "privacy_policy_section6_content": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy in the app.",
+  "about_version": "Version",
+  "about_developer_title": "Developer Information",
+  "about_rights_reserved": "All rights reserved."
 }

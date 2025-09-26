@@ -95,7 +95,10 @@
   "privacy_policy_section4_title": "Partage d'informations",
   "privacy_policy_section4_content": "Nous ne partageons pas vos informations personnelles avec des tiers, car nous ne les collectons pas.",
   "privacy_policy_section5_title": "Sécurité des données",
-  "privacy_policy_section5_content": "La sécurité de vos données dépend de la sécurité de votre appareil. Nous vous recommandons d'utiliser les fonctionnalités de sécurité de votre appareil pour protéger vos données.",
+  "privacy_policy_section5_content": "La sécurité de vos données dépend de la sécurité de votre appareil. Nous vous recommandons d'utiliser les fonctionnalités de sécurité de votre appareil pour proteger vos données.",
   "privacy_policy_section6_title": "Modifications de cette politique",
-  "privacy_policy_section6_content": "Nous pouvons mettre à jour cette politique de confidentialité de temps à autre. Nous vous informerons de tout changement en publiant la nouvelle politique de confidentialité dans l'application."
+  "privacy_policy_section6_content": "Nous pouvons mettre à jour cette politique de confidentialité de temps à autre. Nous vous informerons de tout changement en publiant la nouvelle politique de confidentialité dans l'application.",
+  "about_version": "Version",
+  "about_developer_title": "Informations sur le développeur",
+  "about_rights_reserved": "Tous droits réservés."
 }

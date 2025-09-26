@@ -95,7 +95,10 @@
   "privacy_policy_section4_title": "信息共享",
   "privacy_policy_section4_content": "由于我们不收集您的个人信息，因此我们不会与任何第三方分享您的个人信息。",
   "privacy_policy_section5_title": "数据安全",
-  "privacy_policy_section5_content": "您的数据安全取决于您设备的安全性。我们建议您使用设备的安全功能来保护您的数据。",
+  "privacy_policy_section5_content": "您的数据安全取决于您设备的安全。我们建议您使用设备的安全功能来保护您的数据。",
   "privacy_policy_section6_title": "本政策的变更",
-  "privacy_policy_section6_content": "我们可能会不时更新本隐私政策。我们将通过在应用程序中发布新的隐私政策来通知您任何变更。"
+  "privacy_policy_section6_content": "我们可能会不时更新本隐私政策。我们将通过在应用程序中发布新的隐私政策来通知您任何变更。",
+  "about_version": "版本",
+  "about_developer_title": "开发者信息",
+  "about_rights_reserved": "版权所有。"
 }
