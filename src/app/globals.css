@@ -61,6 +61,62 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  /* Custom Themes */
+  .theme-default {
+    --primary: 25 95% 53%;
+    --accent: 25 95% 53%;
+    --ring: 25 95% 53%;
+  }
+  .dark.theme-default {
+    --primary: 25 95% 53%;
+    --accent: 25 95% 53%;
+    --ring: 25 95% 63%;
+  }
+
+  .theme-rose {
+    --primary: 346.8 90.1% 60.2%;
+    --accent: 346.8 90.1% 60.2%;
+    --ring: 346.8 90.1% 60.2%;
+  }
+  .dark.theme-rose {
+    --primary: 346.8 90.1% 60.2%;
+    --accent: 346.8 90.1% 60.2%;
+    --ring: 346.8 90.1% 60.2%;
+  }
+
+  .theme-green {
+    --primary: 142.1 76.2% 36.3%;
+    --accent: 142.1 76.2% 36.3%;
+    --ring: 142.1 76.2% 36.3%;
+  }
+  .dark.theme-green {
+    --primary: 142.1 76.2% 36.3%;
+    --accent: 142.1 76.2% 36.3%;
+    --ring: 142.1 76.2% 36.3%;
+  }
+
+  .theme-blue {
+    --primary: 221.2 83.2% 53.3%;
+    --accent: 221.2 83.2% 53.3%;
+    --ring: 221.2 83.2% 53.3%;
+  }
+  .dark.theme-blue {
+    --primary: 221.2 83.2% 53.3%;
+    --accent: 221.2 83.2% 53.3%;
+    --ring: 221.2 83.2% 53.3%;
+  }
+
+  .theme-violet {
+    --primary: 262.1 83.3% 57.8%;
+    --accent: 262.1 83.3% 57.8%;
+    --ring: 262.1 83.3% 57.8%;
+  }
+  .dark.theme-violet {
+    --primary: 262.1 83.3% 57.8%;
+    --accent: 262.1 83.3% 57.8%;
+    --ring: 262.1 83.3% 57.8%;
+  }
 }
 
 @layer base {
