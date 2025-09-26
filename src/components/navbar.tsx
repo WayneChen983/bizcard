@@ -10,7 +10,7 @@ import { ScanCardDialog } from './scan-card-dialog';
 import { useState } from 'react';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 import { useLanguage } from '@/context/language-context';
-import { User, Settings } from 'lucide-react';
+import { User } from 'lucide-react';
 import type { Contact } from '@/lib/types';
 
 
@@ -42,8 +42,8 @@ export function Navbar({ onScanComplete }: { onScanComplete: (contact: Partial<C
       images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
     };
     
-    // Directly call the callback function passed from the layout.
-    if (onScanComplete) {
+    // Directly call the callback function passed from the layout/page.
+    if (onScanComplete && pathname === '/') {
       onScanComplete(newContact);
     }
     setIsScanDialogOpen(false);

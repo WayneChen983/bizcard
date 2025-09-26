@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Contact } from '@/lib/types';
 import { initialContacts } from '@/lib/contacts-data';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { useLanguage } from '@/context/language-context';
 import { useRouter } from 'next/navigation';
+import { Navbar } from '@/components/navbar';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
@@ -34,22 +35,7 @@ export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
-
-  useEffect(() => {
-    // This effect now specifically listens for events to CREATE a new contact.
-    const handler = (event: Event) => {
-      const customEvent = event as CustomEvent<Contact>;
-      handleScanAndSave(customEvent.detail);
-    };
-
-    window.addEventListener('newContactCreated', handler);
-
-    return () => {
-      window.removeEventListener('newContactCreated', handler);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  
   useEffect(() => {
     try {
       const storedContacts = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -118,15 +104,30 @@ export default function Home() {
   };
 
   // This function is specifically for creating a NEW contact from a scan and saving it automatically.
-  const handleScanAndSave = (scannedData: Contact) => {
-    // Save it immediately and add to the list
-    setContacts((prev) => [scannedData, ...prev]);
+  const handleScanAndSave = useCallback((scannedData: Partial<Contact>) => {
+    const newContact: Contact = {
+      id: new Date().toISOString(),
+      name: scannedData.name || 'New Contact',
+      company: scannedData.company || '',
+      jobTitle: scannedData.jobTitle || '',
+      phone: scannedData.phone || '',
+      mobilePhone: scannedData.mobilePhone || '',
+      email: scannedData.email || '',
+      website: scannedData.website || '',
+      address: scannedData.address || '',
+      socialMedia: scannedData.socialMedia || '',
+      other: scannedData.other || '',
+      groups: [],
+      images: scannedData.images || [],
+    };
+
+    setContacts((prev) => [newContact, ...prev]);
   
     toast({
       title: t('contact_added_toast_title'),
-      description: `${scannedData.name} ${t('contact_autosaved_toast_desc')}`,
+      description: `${newContact.name} ${t('contact_autosaved_toast_desc')}`,
     });
-  };
+  }, [t]);
   
   const filteredContacts = useMemo(() => {
     if (!searchQuery) return contacts;
@@ -214,6 +215,10 @@ export default function Home() {
           </ScrollArea>
         </SheetContent>
       </Sheet>
+      {/* The Navbar is now rendered in layout.tsx but we pass the page-specific handler */}
+      <div style={{display: 'none'}}>
+        <Navbar onScanComplete={handleScanAndSave} />
+      </div>
     </>
   );
 }
