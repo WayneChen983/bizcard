@@ -10,6 +10,7 @@ import { ScanCardDialog } from './scan-card-dialog';
 import { useState } from 'react';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 import { useLanguage } from '@/context/language-context';
+import { User } from 'lucide-react';
 
 export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => void }) {
   const pathname = usePathname();
@@ -19,7 +20,7 @@ export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<Scan
   const navItems = [
     { href: '/', label: t('nav_contacts'), icon: Icons.home },
     { href: '/scan', label: t('nav_scan'), icon: Icons.camera, isCentral: true },
-    { href: '/settings/profile', label: t('nav_my_card'), icon: Icons.settings },
+    { href: '/settings/profile', label: t('nav_my_card'), icon: User },
   ];
 
   const handleScan = (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
@@ -28,13 +29,17 @@ export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<Scan
   };
   
   const isSettingsPage = pathname.startsWith('/settings');
+  const isMyCardPage = pathname.startsWith('/settings/profile');
+
+  // Hide scan button on any settings page including profile
+  const hideScanButton = isSettingsPage;
 
   return (
     <>
       <nav className="sticky bottom-0 z-10 border-t bg-background">
         <div className="mx-auto flex h-20 max-w-md items-center justify-around">
           {navItems.map((item) => {
-            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+            const isActive = item.href === '/' ? pathname === '/' : (item.href === '/settings/profile' ? isMyCardPage : pathname.startsWith(item.href));
 
             if (item.isCentral) {
               return (
@@ -44,10 +49,10 @@ export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<Scan
                     size="icon"
                     className={cn(
                       "h-16 w-16 rounded-full shadow-lg transition-transform duration-300 ease-in-out",
-                      (isSettingsPage && !pathname.startsWith('/settings/profile')) ? "translate-y-24" : "-translate-y-6"
+                      hideScanButton ? "translate-y-24" : "-translate-y-6"
                     )}
                     onClick={() => setIsScanDialogOpen(true)}
-                    tabIndex={(isSettingsPage && !pathname.startsWith('/settings/profile')) ? -1 : 0}
+                    tabIndex={hideScanButton ? -1 : 0}
                     aria-label={item.label}
                   >
                     <item.icon className="h-8 w-8" />
