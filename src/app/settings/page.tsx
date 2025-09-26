@@ -37,7 +37,7 @@ const SettingsPage = () => {
       label: t('privacy_policy_title'),
     },
     {
-      href: '/about',
+      href: 'https://example.com/privacy',
       icon: Info,
       label: t('about_title'),
     },
