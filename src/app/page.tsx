@@ -22,6 +22,8 @@ import Image from 'next/image';
 import { useLanguage } from '@/context/language-context';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/navbar';
+import { ScanCardDialog } from '@/components/scan-card-dialog';
+import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
@@ -35,6 +37,7 @@ export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
+  const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
   
   useEffect(() => {
     try {
@@ -141,6 +144,29 @@ export default function Home() {
   
   const isEditing = !!editingContact?.id;
 
+  const handleNavbarScanClick = () => {
+    setIsScanDialogOpen(true);
+  };
+
+  const handleHomePageScanComplete = (scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
+    const newContact: Partial<Contact> = {
+      name: scannedData.name || '',
+      company: scannedData.company || '',
+      jobTitle: scannedData.jobTitle || '',
+      phone: scannedData.phone || '',
+      mobilePhone: scannedData.mobilePhone || '',
+      email: scannedData.email || '',
+      website: scannedData.website || '',
+      address: scannedData.address || '',
+      socialMedia: scannedData.socialMedia || '',
+      other: scannedData.other || '',
+      groups: [],
+      images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
+    };
+    handleScanAndSave(newContact);
+    setIsScanDialogOpen(false); // Close dialog after scan
+  };
+
   return (
     <>
       <div className="flex h-full flex-col">
@@ -217,7 +243,12 @@ export default function Home() {
           </SheetContent>
         </Sheet>
         
-        <Navbar onScanComplete={handleScanAndSave} />
+        <Navbar onScanClick={handleNavbarScanClick} />
+        <ScanCardDialog
+          open={isScanDialogOpen}
+          onOpenChange={setIsScanDialogOpen}
+          onScanComplete={handleHomePageScanComplete}
+        />
       </div>
     </>
   );
