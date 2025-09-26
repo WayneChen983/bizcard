@@ -14,7 +14,11 @@ import { User } from 'lucide-react';
 import type { Contact } from '@/lib/types';
 
 
-export function Navbar({ onScanComplete }: { onScanComplete: (contact: Partial<Contact>) => void }) {
+interface NavbarProps {
+  onScanComplete?: (contact: Partial<Contact>) => void;
+}
+
+export function Navbar({ onScanComplete }: NavbarProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
@@ -42,8 +46,8 @@ export function Navbar({ onScanComplete }: { onScanComplete: (contact: Partial<C
       images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
     };
     
-    // Directly call the callback function passed from the layout/page.
-    if (onScanComplete && pathname === '/') {
+    // Directly call the callback function passed from the parent component (e.g., Home page).
+    if (onScanComplete) {
       onScanComplete(newContact);
     }
     setIsScanDialogOpen(false);

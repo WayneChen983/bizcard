@@ -178,10 +178,10 @@ export default function Home() {
         </main>
 
         <Sheet open={isSheetOpen} onOpenChange={(isOpen) => {
-            setIsSheetOpen(isOpen);
             if (!isOpen) {
               setEditingContact(null);
             }
+            setIsSheetOpen(isOpen);
           }}>
           <SheetContent side="right" className="w-full max-w-md p-0">
             <ScrollArea className="h-full">
