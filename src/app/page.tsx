@@ -21,6 +21,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { useLanguage } from '@/context/language-context';
 import { useRouter } from 'next/navigation';
+import { Navbar } from '@/components/navbar';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
@@ -36,18 +37,19 @@ export default function Home() {
   const { t } = useLanguage();
 
   useEffect(() => {
+    // This effect now specifically listens for events to CREATE a new contact.
     const handler = (event: Event) => {
       const customEvent = event as CustomEvent<Contact>;
       handleScanAndCreate(customEvent.detail);
     };
 
-    window.addEventListener('scanComplete', handler);
+    window.addEventListener('newContactScan', handler);
 
     return () => {
-      window.removeEventListener('scanComplete', handler);
+      window.removeEventListener('newContactScan', handler);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [t]);
+  }, [t, contacts]);
 
   useEffect(() => {
     try {
@@ -115,10 +117,22 @@ export default function Home() {
     }, 500);
   };
 
-  const handleScanAndCreate = (scannedContact: Contact) => {
+  const handleScanAndCreate = (scannedData: Partial<Contact>) => {
     const newContact: Contact = {
-      ...scannedContact,
-      id: scannedContact.id || new Date().toISOString(),
+      ...scannedData,
+      id: scannedData.id || new Date().toISOString(),
+      name: scannedData.name || '',
+      company: scannedData.company || '',
+      jobTitle: scannedData.jobTitle || '',
+      phone: scannedData.phone || '',
+      mobilePhone: scannedData.mobilePhone || '',
+      email: scannedData.email || '',
+      website: scannedData.website || '',
+      address: scannedData.address || '',
+      socialMedia: scannedData.socialMedia || '',
+      other: scannedData.other || '',
+      groups: [],
+      images: scannedData.images || [],
     };
   
     // Auto-save the contact immediately
@@ -134,7 +148,6 @@ export default function Home() {
     });
   };
   
-
   const filteredContacts = useMemo(() => {
     if (!searchQuery) return contacts;
     return contacts.filter(
@@ -172,7 +185,7 @@ export default function Home() {
             />
           </div>
         </div>
-        <ScrollArea className="h-[calc(100vh-210px)] px-4 pb-4">
+        <ScrollArea className="h-[calc(100vh-280px)] px-4 pb-4">
           <ContactList
             contacts={filteredContacts}
             onEdit={handleEdit}

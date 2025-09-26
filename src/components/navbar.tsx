@@ -10,36 +10,55 @@ import { ScanCardDialog } from './scan-card-dialog';
 import { useState } from 'react';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 import { useLanguage } from '@/context/language-context';
-import { User } from 'lucide-react';
+import { User, Settings } from 'lucide-react';
+import type { Contact } from '@/lib/types';
 
-export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => void }) {
+
+export function Navbar() {
   const pathname = usePathname();
   const { t } = useLanguage();
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
 
   const navItems = [
     { href: '/', label: t('nav_contacts'), icon: Icons.home },
-    { href: '/scan', label: t('nav_scan'), icon: Icons.camera, isCentral: true },
+    { href: '#scan', label: t('nav_scan'), icon: Icons.camera, isCentral: true },
     { href: '/settings/profile', label: t('nav_my_card'), icon: User },
   ];
 
-  const handleScan = (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
-    onScanComplete(data);
+  const handleScan = (scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
+    // This logic is now specific to creating a NEW contact.
+    const newContact: Partial<Contact> = {
+      name: scannedData.name || '',
+      company: scannedData.company || '',
+      jobTitle: scannedData.jobTitle || '',
+      phone: scannedData.phone || '',
+      mobilePhone: scannedData.mobilePhone || '',
+      email: scannedData.email || '',
+      website: scannedData.website || '',
+      address: scannedData.address || '',
+      socialMedia: scannedData.socialMedia || '',
+      other: scannedData.other || '',
+      groups: [],
+      images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
+    };
+    
+    // Dispatch a specific event for creating a new contact
+    window.dispatchEvent(new CustomEvent('newContactScan', { detail: newContact }));
     setIsScanDialogOpen(false);
   };
   
-  const isSettingsPage = pathname.startsWith('/settings');
   const isMyCardPage = pathname.startsWith('/settings/profile');
 
   // Hide scan button on any settings page including profile
-  const hideScanButton = isSettingsPage;
+  const hideScanButton = isMyCardPage;
+
 
   return (
     <>
       <nav className="sticky bottom-0 z-10 border-t bg-background">
         <div className="mx-auto flex h-20 max-w-md items-center justify-around">
           {navItems.map((item) => {
-            const isActive = item.href === '/' ? pathname === '/' : (item.href === '/settings/profile' ? isMyCardPage : pathname.startsWith(item.href));
+            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
 
             if (item.isCentral) {
               return (

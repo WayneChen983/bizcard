@@ -8,8 +8,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { Navbar } from '@/components/navbar';
 import { usePathname } from 'next/navigation';
-import { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
-import type { Contact } from '@/lib/types';
 import { LanguageProvider } from '@/context/language-context';
 
 const fontBody = Inter({
@@ -39,28 +37,6 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
 
-  const handleScanComplete = (scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
-    const newContact: Partial<Contact> = {
-      id: new Date().toISOString(),
-      name: scannedData.name || '',
-      company: scannedData.company || '',
-      jobTitle: scannedData.jobTitle || '',
-      phone: scannedData.phone || '',
-      mobilePhone: scannedData.mobilePhone || '',
-      email: scannedData.email || '',
-      website: scannedData.website || '',
-      address: scannedData.address || '',
-      socialMedia: scannedData.socialMedia || '',
-      other: scannedData.other || '',
-      groups: [],
-      images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
-    };
-    
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('scanComplete', { detail: newContact }));
-    }
-  };
-
   const pagesWithoutNavbar = ['/scan'];
   const showNavbar = !pagesWithoutNavbar.includes(pathname);
 
@@ -83,7 +59,7 @@ export default function RootLayout({
           <div className="relative flex h-screen w-full justify-center bg-background">
             <div className="relative flex h-full w-full max-w-md flex-col border-x">
               {children}
-              {showNavbar && <Navbar onScanComplete={handleScanComplete} />}
+              {showNavbar && <Navbar />}
             </div>
           </div>
           <Toaster />
