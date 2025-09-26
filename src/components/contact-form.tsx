@@ -30,31 +30,34 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-
-const formSchema = z.object({
-  name: z.string().min(1, { message: '姓名為必填欄位' }),
-  company: z.string().optional(),
-  jobTitle: z.string().optional(),
-  phone: z.string().optional(),
-  mobilePhone: z.string().optional(),
-  email: z.string().email({ message: '無效的電子郵件地址' }).optional().or(z.literal('')),
-  website: z.string().url({ message: '無效的網址' }).optional().or(z.literal('')),
-  address: z.string().optional(),
-  socialMedia: z.string().optional(),
-  other: z.string().optional(),
-});
-
-type ContactFormValues = z.infer<typeof formSchema>;
-
-interface ContactFormProps {
-  contact?: Contact | null;
-  onSave: (contact: Contact) => void;
-  onDelete?: (id: string) => void;
-  isSaving: boolean;
-}
+} from "@/components/ui/alert-dialog";
+import { useLanguage } from '@/context/language-context';
 
 export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactFormProps) {
+  const { t } = useLanguage();
+
+  const formSchema = z.object({
+    name: z.string().min(1, { message: t('validation_name_required') }),
+    company: z.string().optional(),
+    jobTitle: z.string().optional(),
+    phone: z.string().optional(),
+    mobilePhone: z.string().optional(),
+    email: z.string().email({ message: t('validation_email_invalid') }).optional().or(z.literal('')),
+    website: z.string().url({ message: t('validation_website_invalid') }).optional().or(z.literal('')),
+    address: z.string().optional(),
+    socialMedia: z.string().optional(),
+    other: z.string().optional(),
+  });
+  
+  type ContactFormValues = z.infer<typeof formSchema>;
+  
+  interface ContactFormProps {
+    contact?: Contact | null;
+    onSave: (contact: Contact) => void;
+    onDelete?: (id: string) => void;
+    isSaving: boolean;
+  }
+
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
 
   const form = useForm<ContactFormValues>({
@@ -139,7 +142,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
               onClick={() => setIsScanDialogOpen(true)}
             >
               <ScanLine className="mr-2 h-5 w-5" />
-              掃描名片自動填寫
+              {t('scan_card_button')}
             </Button>
           )}
           
@@ -148,7 +151,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>姓名</FormLabel>
+                <FormLabel>{t('form_label_name')}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -161,7 +164,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             name="company"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>公司</FormLabel>
+                <FormLabel>{t('form_label_company')}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -174,7 +177,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             name="jobTitle"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>部門</FormLabel>
+                <FormLabel>{t('form_label_job_title')}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -183,13 +186,13 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             )}
           />
 
-          <h3 className="font-semibold pt-2 border-t">聯絡資訊</h3>
+          <h3 className="font-semibold pt-2 border-t">{t('form_section_contact')}</h3>
           <FormField
             control={form.control}
             name="mobilePhone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>手機電話</FormLabel>
+                <FormLabel>{t('form_label_mobile')}</FormLabel>
                 <FormControl>
                   <Input type="tel" {...field} />
                 </FormControl>
@@ -202,7 +205,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>電子郵件</FormLabel>
+                <FormLabel>{t('form_label_email')}</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
@@ -215,7 +218,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             name="website"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>網站</FormLabel>
+                <FormLabel>{t('form_label_website')}</FormLabel>
                 <FormControl>
                    <Input {...field} />
                 </FormControl>
@@ -224,13 +227,13 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             )}
           />
 
-          <h3 className="font-semibold pt-2 border-t">其他</h3>
+          <h3 className="font-semibold pt-2 border-t">{t('form_section_other')}</h3>
           <FormField
             control={form.control}
             name="socialMedia"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>社群媒體</FormLabel>
+                <FormLabel>{t('form_label_social')}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -243,7 +246,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>地址</FormLabel>
+                <FormLabel>{t('form_label_address')}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -256,7 +259,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             name="other"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>備註</FormLabel>
+                <FormLabel>{t('form_label_notes')}</FormLabel>
                 <FormControl>
                   <Textarea {...field} />
                 </FormControl>
@@ -275,21 +278,21 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>確定要刪除嗎？</AlertDialogTitle>
+                      <AlertDialogTitle>{t('delete_dialog_title')}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        此操作無法復原。這將永久刪除此聯絡人。
+                        {t('delete_dialog_desc')}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>取消</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDelete}>刪除</AlertDialogAction>
+                      <AlertDialogCancel>{t('cancel_button')}</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>{t('delete_button')}</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
             )}
             <Button type="submit" className="w-full" disabled={isSaving}>
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              儲存
+              {t('save_button')}
             </Button>
           </div>
         </form>

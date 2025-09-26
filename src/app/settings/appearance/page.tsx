@@ -9,9 +9,11 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 import { ChevronLeft, Sun, Moon, Monitor } from 'lucide-react';
+import { useLanguage } from '@/context/language-context';
 
 const AppearancePage = () => {
   const router = useRouter();
+  const { t } = useLanguage();
   const [theme, setTheme] = useState('system');
   const [fontSize, setFontSize] = useState(16);
   const [mounted, setMounted] = useState(false);
@@ -61,7 +63,7 @@ const AppearancePage = () => {
           <ChevronLeft className="h-6 w-6" />
         </Button>
         <h1 className="mx-auto font-headline text-xl font-bold tracking-tight text-foreground">
-          外觀
+          {t('appearance_title')}
         </h1>
         <div className="w-10"></div>
       </header>
@@ -69,7 +71,7 @@ const AppearancePage = () => {
         <div className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle>色彩主題</CardTitle>
+              <CardTitle>{t('theme_title')}</CardTitle>
             </CardHeader>
             <CardContent>
               <RadioGroup
@@ -83,7 +85,7 @@ const AppearancePage = () => {
                 >
                   <RadioGroupItem value="light" id="light" className="sr-only" />
                   <Sun className="mb-2 h-6 w-6" />
-                  淺色
+                  {t('theme_light')}
                 </Label>
                 <Label
                   htmlFor="dark"
@@ -91,7 +93,7 @@ const AppearancePage = () => {
                 >
                   <RadioGroupItem value="dark" id="dark" className="sr-only" />
                   <Moon className="mb-2 h-6 w-6" />
-                  深色
+                  {t('theme_dark')}
                 </Label>
                 <Label
                   htmlFor="system"
@@ -103,7 +105,7 @@ const AppearancePage = () => {
                     className="sr-only"
                   />
                   <Monitor className="mb-2 h-6 w-6" />
-                  跟隨系統
+                  {t('theme_system')}
                 </Label>
               </RadioGroup>
             </CardContent>
@@ -111,12 +113,12 @@ const AppearancePage = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>字體大小</CardTitle>
+              <CardTitle>{t('font_size_title')}</CardTitle>
             </CardHeader>
             <CardContent className="pt-2">
                 <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">小</span>
-                    <span className="text-xl text-muted-foreground">大</span>
+                    <span className="text-sm text-muted-foreground">{t('font_size_small')}</span>
+                    <span className="text-xl text-muted-foreground">{t('font_size_large')}</span>
                 </div>
               <Slider
                 min={12}

@@ -34,11 +34,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { ScanCardDialog } from '@/components/scan-card-dialog';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
+import { useLanguage } from '@/context/language-context';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
 const ProfilePage = () => {
   const router = useRouter();
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [userContact, setUserContact] = useState<Contact | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -73,10 +75,10 @@ const ProfilePage = () => {
         
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
         setUserContact(updatedContact);
-        toast({ title: '名片已更新' });
+        toast({ title: t('profile_updated_toast_title') });
       } catch (error) {
         console.error('Failed to save contacts to localStorage', error);
-        toast({ variant: 'destructive', title: '儲存失敗' });
+        toast({ variant: 'destructive', title: t('save_failed_toast_title') });
       } finally {
         setIsSaving(false);
         setIsSheetOpen(false);
@@ -109,19 +111,19 @@ const ProfilePage = () => {
       }
       
       setUserContact(updatedContact);
-      toast({ title: "名片已更新", description: "AI已自動填入新資訊，請確認後儲存。" });
+      toast({ title: t('profile_updated_toast_title'), description: t('profile_updated_ai_toast_desc') });
     }
   };
   
   const infoItems = userContact ? [
-    { icon: Briefcase, label: '部門', value: userContact.jobTitle },
-    { icon: Phone, label: '手機', value: userContact.mobilePhone },
-    { icon: Mail, label: 'Email', value: userContact.email },
-    { icon: GlobeIcon, label: '網站', value: userContact.website },
-    { icon: Building, label: '公司', value: userContact.company },
-    { icon: MapPin, label: '地址', value: userContact.address },
-    { icon: MessageSquare, label: '社群媒體', value: userContact.socialMedia },
-    { icon: Info, label: '備註', value: userContact.other },
+    { icon: Briefcase, label: t('form_label_job_title'), value: userContact.jobTitle },
+    { icon: Phone, label: t('form_label_mobile'), value: userContact.mobilePhone },
+    { icon: Mail, label: t('form_label_email'), value: userContact.email },
+    { icon: GlobeIcon, label: t('form_label_website'), value: userContact.website },
+    { icon: Building, label: t('form_label_company'), value: userContact.company },
+    { icon: MapPin, label: t('form_label_address'), value: userContact.address },
+    { icon: MessageSquare, label: t('form_label_social'), value: userContact.socialMedia },
+    { icon: Info, label: t('form_label_notes'), value: userContact.other },
   ] : [];
 
   return (
@@ -132,7 +134,7 @@ const ProfilePage = () => {
             <ChevronLeft className="h-6 w-6" />
           </Button>
           <h1 className="font-headline text-xl font-bold tracking-tight text-foreground">
-            我的名片
+            {t('my_card_title')}
           </h1>
           <Button variant="ghost" size="icon" onClick={() => setIsSheetOpen(true)}>
             <Pencil className="h-5 w-5" />
@@ -177,7 +179,7 @@ const ProfilePage = () => {
               </CardContent>
             </Card>
           ) : (
-             <p className="p-4 text-center text-muted-foreground">正在載入您的名片...</p>
+             <p className="p-4 text-center text-muted-foreground">{t('loading_profile_message')}</p>
           )}
         </main>
       </div>
@@ -198,14 +200,14 @@ const ProfilePage = () => {
             <SheetHeader className="p-6">
               <div className="flex items-center justify-between">
                 <SheetTitle className="font-headline text-2xl">
-                  編輯我的名片
+                  {t('edit_my_card_title')}
                 </SheetTitle>
                 <Button variant="outline" size="icon" onClick={() => setIsScanDialogOpen(true)}>
                   <Camera className="h-5 w-5" />
                 </Button>
               </div>
               <SheetDescription>
-                更新您的個人名片資訊。
+                {t('edit_my_card_desc')}
               </SheetDescription>
             </SheetHeader>
             <div className="px-6 pb-6">
@@ -228,5 +230,3 @@ const ProfilePage = () => {
 }
 
 export default ProfilePage;
-
-    

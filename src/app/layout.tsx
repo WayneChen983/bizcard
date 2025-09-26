@@ -8,9 +8,9 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { Navbar } from '@/components/navbar';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import type { Contact } from '@/lib/types';
 import { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
+import type { Contact } from '@/lib/types';
+import { LanguageProvider } from '@/context/language-context';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -66,7 +66,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <title>BizCard Pro</title>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body
@@ -76,13 +76,15 @@ export default function RootLayout({
           fontHeadline.variable
         )}
       >
-        <div className="relative flex h-screen w-full justify-center bg-background">
-          <div className="relative flex h-full w-full max-w-md flex-col border-x">
-            {children}
-            {pathname !== '/scan' && <Navbar onScanComplete={handleScanComplete} />}
+        <LanguageProvider>
+          <div className="relative flex h-screen w-full justify-center bg-background">
+            <div className="relative flex h-full w-full max-w-md flex-col border-x">
+              {children}
+              {pathname !== '/scan' && <Navbar onScanComplete={handleScanComplete} />}
+            </div>
           </div>
-        </div>
-        <Toaster />
+          <Toaster />
+        </LanguageProvider>
       </body>
     </html>
   );

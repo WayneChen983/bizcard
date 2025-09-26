@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { scanCardDetails, ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 import { Loader2, Camera as CameraIcon, X, Zap, ZapOff, Image as ImageIcon, Check, ArrowLeft } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useLanguage } from '@/context/language-context';
 
 interface ScanCardDialogProps {
   open: boolean;
@@ -32,8 +33,8 @@ export function ScanCardDialog({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
@@ -59,8 +60,8 @@ export function ScanCardDialog({
         setHasCameraPermission(false);
         toast({
           variant: "destructive",
-          title: "相機權限遭拒",
-          description: "請在您的瀏覽器設定中允許相機權限以使用此功能。",
+          title: t('camera_permission_denied_title'),
+          description: t('camera_permission_denied_desc'),
         });
       }
     } else {
@@ -86,8 +87,8 @@ export function ScanCardDialog({
     onOpenChange(false);
     
     toast({
-        title: '正在掃描名片...',
-        description: '掃描完成後將會自動填入資訊。',
+        title: t('scanning_toast_title'),
+        description: t('scanning_toast_desc'),
     });
 
     // Run scan in the background
@@ -95,15 +96,15 @@ export function ScanCardDialog({
       .then(result => {
         onScanComplete({ ...result, cardImageUrl: cardImageDataUri });
         toast({
-          title: '掃描成功',
-          description: '已填入聯絡人詳細資訊。',
+          title: t('scan_success_toast_title'),
+          description: t('scan_success_toast_desc'),
         });
       })
       .catch(error => {
         console.error('Error scanning card:', error);
         toast({
-          title: '掃描失敗',
-          description: '無法從卡片中提取詳細資訊。請重試或手動輸入。',
+          title: t('scan_failed_toast_title'),
+          description: t('scan_failed_toast_desc'),
           variant: 'destructive',
         });
       });
@@ -173,10 +174,10 @@ export function ScanCardDialog({
           setIsFlashOn(!isFlashOn);
         } catch (err) {
           console.error("Error toggling flash:", err);
-          toast({ variant: "destructive", title: "閃光燈錯誤", description: "無法控制閃光燈" });
+          toast({ variant: "destructive", title: t('flash_error_title'), description: t('flash_error_desc') });
         }
       } else {
-        toast({ variant: "default", title: "不支援閃光燈", description: "您的裝置不支援閃光燈" });
+        toast({ variant: "default", title: t('flash_not_supported_title'), description: t('flash_not_supported_desc') });
       }
     }
   };
@@ -185,7 +186,7 @@ export function ScanCardDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md w-full h-screen flex flex-col p-0 gap-0 bg-black text-white">
         <DialogHeader className="p-4 flex flex-row items-center justify-between border-b border-gray-700 z-10 bg-black">
-          <DialogTitle className='font-headline text-white'>掃描名片</DialogTitle>
+          <DialogTitle className='font-headline text-white'>{t('scan_card_dialog_title')}</DialogTitle>
           <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
             <X className="h-6 w-6 text-white" />
           </Button>
@@ -201,15 +202,15 @@ export function ScanCardDialog({
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <div className="w-[90%] h-[50%] border-4 border-white/80 rounded-2xl shadow-lg bg-black/20" />
                   <p className="absolute top-1/4 left-1/2 -translate-x-1/2 text-white/90 bg-black/50 px-4 py-2 rounded-md text-center">
-                    將名片對準掃描框
+                    {t('scan_card_instruction')}
                   </p>
                 </div>
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center p-4">
                   <Alert variant="destructive">
-                    <AlertTitle>需要相機權限</AlertTitle>
+                    <AlertTitle>{t('camera_permission_denied_title')}</AlertTitle>
                     <AlertDescription>
-                      請在瀏覽器設定中啟用相機權限以掃描名片。
+                      {t('camera_permission_denied_instructions')}
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -224,11 +225,11 @@ export function ScanCardDialog({
             <>
               <Button variant="outline" onClick={setupCamera} className="text-white border-white">
                 <ArrowLeft className="mr-2 h-5 w-5" />
-                重新拍攝
+                {t('retake_button')}
               </Button>
               <Button onClick={confirmAndScan} className="bg-primary text-primary-foreground">
                 <Check className="mr-2 h-5 w-5" />
-                使用照片
+                {t('use_photo_button')}
               </Button>
             </>
           ) : (

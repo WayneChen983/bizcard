@@ -18,14 +18,22 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
 import { ContactForm } from '@/components/contact-form';
 import { ContactList } from '@/components/contact-list';
-import { Menu, Search, Palette, Globe, Info } from 'lucide-react';
+import { Menu, Search, Palette, Globe, Info, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useLanguage } from '@/context/language-context';
+import type { Language, LanguageDefinition } from '@/lib/i18n';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
@@ -38,6 +46,7 @@ export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const { t, setLanguage, language, languages } = useLanguage();
 
   useEffect(() => {
     const handler = (event: Event) => {
@@ -51,7 +60,7 @@ export default function Home() {
       window.removeEventListener('scanComplete', handler);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     try {
@@ -91,8 +100,8 @@ export default function Home() {
   const handleDelete = (id: string) => {
     setContacts((prev) => prev.filter((c) => c.id !== id));
     toast({
-      title: '聯絡人已刪除',
-      description: '聯絡人已成功移除',
+      title: t('contact_deleted_toast_title'),
+      description: t('contact_deleted_toast_desc'),
     });
     setIsSheetOpen(false);
     setEditingContact(null);
@@ -106,12 +115,12 @@ export default function Home() {
         setContacts((prev) =>
           prev.map((c) => (c.id === contact.id ? contact : c))
         );
-        toast({ title: '聯絡人已更新' });
+        toast({ title: t('contact_updated_toast_title') });
       } else {
         // This handles both new contacts created via scanning and manually
         const newContact = { ...contact, id: contact.id || new Date().toISOString() };
         setContacts((prev) => [newContact, ...prev]);
-        toast({ title: '聯絡人已新增' });
+        toast({ title: t('contact_added_toast_title') });
       }
       setIsSaving(false);
       setIsSheetOpen(false);
@@ -133,8 +142,8 @@ export default function Home() {
     setIsSheetOpen(true);
   
     toast({
-      title: '聯絡人已自動儲存',
-      description: '您可以選擇性地編輯詳細資訊。',
+      title: t('contact_autosaved_toast_title'),
+      description: t('contact_autosaved_toast_desc'),
     });
   };
   
@@ -155,7 +164,7 @@ export default function Home() {
     <>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/80 p-4 backdrop-blur-sm">
         <h1 className="font-headline text-xl font-bold tracking-tight text-foreground">
-          名片列表
+          {t('contact_list_title')}
         </h1>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -166,15 +175,28 @@ export default function Home() {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => router.push('/settings/appearance')}>
               <Palette className="mr-2 h-4 w-4" />
-              <span>外觀</span>
+              <span>{t('appearance_title')}</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Globe className="mr-2 h-4 w-4" />
-              <span>語言</span>
-            </DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Globe className="mr-2 h-4 w-4" />
+                <span>{t('language_title')}</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <DropdownMenuRadioGroup value={language} onValueChange={(value) => setLanguage(value as Language)}>
+                    {Object.values(languages).map((lang: LanguageDefinition) => (
+                      <DropdownMenuRadioItem key={lang.code} value={lang.code}>
+                        {lang.name}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
             <DropdownMenuItem>
               <Info className="mr-2 h-4 w-4" />
-              <span>關於</span>
+              <span>{t('about_title')}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -186,7 +208,7 @@ export default function Home() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="搜尋聯絡人..."
+              placeholder={t('search_placeholder')}
               className="pl-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -223,12 +245,12 @@ export default function Home() {
             )}
             <SheetHeader className="p-6">
               <SheetTitle className="font-headline text-2xl">
-                {isEditing ? '編輯聯絡人' : '新增聯絡人'}
+                {isEditing ? t('edit_contact_title') : t('add_contact_title')}
               </SheetTitle>
               <SheetDescription>
                 {isEditing
-                  ? '更新此聯絡人的詳細資訊。'
-                  : '將新聯絡人新增至您的清單。試試掃描名片！'}
+                  ? t('edit_contact_desc')
+                  : t('add_contact_desc')}
               </SheetDescription>
             </SheetHeader>
             <div className="px-6 pb-6">

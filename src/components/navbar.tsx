@@ -10,17 +10,19 @@ import { ScanCardDialog } from './scan-card-dialog';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
-
-const navItems = [
-  { href: '/', label: '名片列表', icon: Icons.home },
-  { href: '/scan', label: '掃描', icon: Icons.camera, isCentral: true },
-  { href: '/settings/profile', label: '我的名片', icon: Icons.profile },
-];
+import { useLanguage } from '@/context/language-context';
 
 export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => void }) {
   const pathname = usePathname();
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
+
+  const navItems = [
+    { href: '/', label: t('nav_contacts'), icon: Icons.home },
+    { href: '/scan', label: t('nav_scan'), icon: Icons.camera, isCentral: true },
+    { href: '/settings/profile', label: t('nav_my_card'), icon: Icons.profile },
+  ];
 
   const handleScan = (data: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
     onScanComplete(data);
@@ -47,6 +49,7 @@ export function Navbar({ onScanComplete }: { onScanComplete: (data: Partial<Scan
                     )}
                     onClick={() => setIsScanDialogOpen(true)}
                     tabIndex={isProfilePage ? -1 : 0}
+                    aria-label={item.label}
                   >
                     <item.icon className="h-8 w-8" />
                   </Button>

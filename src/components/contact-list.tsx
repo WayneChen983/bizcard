@@ -3,6 +3,7 @@
 
 import type { Contact } from '@/lib/types';
 import { ContactCard } from './contact-card';
+import { useLanguage } from '@/context/language-context';
 
 interface ContactListProps {
   contacts: Contact[];
@@ -12,11 +13,12 @@ interface ContactListProps {
 }
 
 export function ContactList({ contacts, onEdit, onDelete }: ContactListProps) {
+  const { t } = useLanguage();
   if (contacts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted bg-card p-12 text-center">
-        <h3 className="text-lg font-medium text-muted-foreground">找不到聯絡人。</h3>
-        <p className="mt-1 text-sm text-muted-foreground">新增聯絡人以開始使用。</p>
+        <h3 className="text-lg font-medium text-muted-foreground">{t('no_contacts_found_title')}</h3>
+        <p className="mt-1 text-sm text-muted-foreground">{t('no_contacts_found_desc')}</p>
       </div>
     );
   }
