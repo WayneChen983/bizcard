@@ -23,7 +23,7 @@ const fontHeadline = PT_Sans({
 });
 
 function AppContent({ children }: { children: React.ReactNode }) {
-  const { theme, isThemeChanging } = useTheme();
+  const { isThemeChanging } = useTheme();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -36,8 +36,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
         className={cn(
           'min-h-screen font-body antialiased',
           fontBody.variable,
-          fontHeadline.variable,
-          `theme-${theme}`
+          fontHeadline.variable
         )}
       >
         <LanguageProvider>
