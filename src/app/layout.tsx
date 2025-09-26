@@ -1,16 +1,15 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import type { Metadata } from 'next';
 import { Inter, PT_Sans } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
-import { Navbar } from '@/components/navbar';
-import { usePathname } from 'next/navigation';
 import { LanguageProvider } from '@/context/language-context';
-import type { Contact } from '@/lib/types';
+import { ThemeProvider, useTheme } from '@/context/theme-context';
+import { Loader2 } from 'lucide-react';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -23,52 +22,8 @@ const fontHeadline = PT_Sans({
   variable: '--font-headline',
 });
 
-// This can't be set in metadata object because we are using 'use client'
-// export const metadata: Metadata = {
-//   title: 'BizCard Pro',
-//   description: 'A smart business card manager.',
-//   icons: {
-//     icon: '/favicon.svg',
-//   },
-// };
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const [theme, setTheme] = useState('default');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const storedTheme = localStorage.getItem('colorTheme') || 'default';
-    setTheme(storedTheme);
-    
-    // Initial theme setup
-    const storedThemeMode = localStorage.getItem('theme') || 'system';
-    if (
-      storedThemeMode === 'dark' ||
-      (storedThemeMode === 'system' &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches)
-    ) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      document.body.classList.forEach(className => {
-        if (className.startsWith('theme-')) {
-          document.body.classList.remove(className);
-        }
-      });
-      document.body.classList.add(`theme-${theme}`);
-    }
-  }, [theme, mounted]);
-
+function AppContent({ children }: { children: React.ReactNode }) {
+  const { theme, isThemeChanging } = useTheme();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -93,7 +48,25 @@ export default function RootLayout({
           </div>
           <Toaster />
         </LanguageProvider>
+
+        {isThemeChanging && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background/80 backdrop-blur-sm">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          </div>
+        )}
       </body>
     </html>
+  );
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <ThemeProvider>
+      <AppContent>{children}</AppContent>
+    </ThemeProvider>
   );
 }

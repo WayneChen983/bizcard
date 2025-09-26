@@ -11,31 +11,24 @@ import { Slider } from '@/components/ui/slider';
 import { ChevronLeft, Sun, Moon, Monitor, Check } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/context/theme-context';
+import { themes } from '@/lib/themes';
 
-const themes = [
-  { name: 'default', color: 'hsl(25, 95%, 53%)' },
-  { name: 'rose', color: 'hsl(346.8, 90.1%, 60.2%)' },
-  { name: 'green', color: 'hsl(142.1, 76.2%, 36.3%)' },
-  { name: 'blue', color: 'hsl(221.2, 83.2%, 53.3%)' },
-  { name: 'violet', color: 'hsl(262.1, 83.3%, 57.8%)' },
-];
 
 const AppearancePage = () => {
   const router = useRouter();
   const { t } = useLanguage();
+  const { theme, setTheme, isThemeChanging } = useTheme();
   const [themeMode, setThemeMode] = useState('system');
-  const [colorTheme, setColorTheme] = useState('default');
   const [fontSize, setFontSize] = useState(16);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     const storedThemeMode = localStorage.getItem('theme') || 'system';
-    const storedColorTheme = localStorage.getItem('colorTheme') || 'default';
     const storedFontSize = localStorage.getItem('fontSize');
     
     setThemeMode(storedThemeMode);
-    setColorTheme(storedColorTheme);
 
     if (storedFontSize) {
       const size = parseInt(storedFontSize, 10);
@@ -57,18 +50,8 @@ const AppearancePage = () => {
         document.documentElement.classList.remove('dark');
       }
       localStorage.setItem('theme', themeMode);
-
-      // Handle color theme
-      document.body.classList.forEach(className => {
-        if (className.startsWith('theme-')) {
-          document.body.classList.remove(className);
-        }
-      });
-      document.body.classList.add(`theme-${colorTheme}`);
-      localStorage.setItem('colorTheme', colorTheme);
-
     }
-  }, [themeMode, colorTheme, mounted]);
+  }, [themeMode, mounted]);
 
   const handleFontSizeChange = (value: number[]) => {
     const newSize = value[0];
@@ -141,21 +124,22 @@ const AppearancePage = () => {
               <CardTitle>色彩主題</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-4">
-              {themes.map((theme) => (
+              {themes.map((t) => (
                 <button
-                  key={theme.name}
-                  onClick={() => setColorTheme(theme.name)}
+                  key={t.name}
+                  onClick={() => setTheme(t.name)}
+                  disabled={isThemeChanging}
                   className={cn(
                     'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all',
-                    colorTheme === theme.name ? 'border-primary' : 'border-transparent'
+                    theme === t.name ? 'border-primary' : 'border-transparent'
                   )}
-                  aria-label={`Select ${theme.name} theme`}
+                  aria-label={`Select ${t.name} theme`}
                 >
                   <div
                     className="h-8 w-8 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: theme.color }}
+                    style={{ backgroundColor: t.color }}
                   >
-                    {colorTheme === theme.name && <Check className="h-5 w-5 text-white" />}
+                    {theme === t.name && <Check className="h-5 w-5 text-white" />}
                   </div>
                 </button>
               ))}
