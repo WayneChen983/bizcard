@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import type { Contact, Group } from '@/lib/types';
+import type { Contact, Group, SortOption } from '@/lib/types';
 import { initialContacts, initialGroups } from '@/lib/contacts-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/sheet';
 import { ContactForm } from '@/components/contact-form';
 import { ContactList } from '@/components/contact-list';
-import { Search, Settings, Folder } from 'lucide-react';
+import { Search, Settings, Folder, ListFilter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
@@ -24,7 +24,16 @@ import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/navbar';
 import { ScanCardDialog } from '@/components/scan-card-dialog';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
-import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { getSortOptions, sortContacts } from '@/lib/sorting';
 
 const CONTACTS_STORAGE_KEY = 'bizcard-pro-contacts';
 const GROUPS_STORAGE_KEY = 'bizcard-pro-groups';
@@ -40,8 +49,9 @@ export default function Home() {
   const [isSaving, setIsSaving] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
+  const [sortOption, setSortOption] = useState<SortOption>('time');
 
   useEffect(() => {
     try {
@@ -103,11 +113,11 @@ export default function Home() {
     setTimeout(() => {
       if (editingContact && contacts.some(c => c.id === contact.id)) {
         setContacts((prev) =>
-          prev.map((c) => (c.id === contact.id ? contact : c))
+          prev.map((c) => (c.id === contact.id ? { ...contact, createdAt: contact.createdAt || new Date().toISOString() } : c))
         );
         toast({ title: t('contact_updated_toast_title') });
       } else {
-        const newContact = { ...contact, id: contact.id || new Date().toISOString() };
+        const newContact = { ...contact, id: contact.id || new Date().toISOString(), createdAt: new Date().toISOString() };
         setContacts((prev) => [newContact, ...prev]);
         toast({ title: t('contact_added_toast_title') });
       }
@@ -120,6 +130,7 @@ export default function Home() {
   const handleScanAndSave = useCallback((scannedData: Partial<Contact>) => {
     const newContact: Contact = {
       id: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       name: scannedData.name || t('new_contact_default_name'),
       company: scannedData.company || '',
       jobTitle: scannedData.jobTitle || '',
@@ -142,7 +153,7 @@ export default function Home() {
     });
   }, [t]);
   
-  const filteredContacts = useMemo(() => {
+  const filteredAndSortedContacts = useMemo(() => {
     let filtered = contacts;
 
     if (searchQuery) {
@@ -160,8 +171,8 @@ export default function Home() {
       );
     }
 
-    return filtered;
-  }, [contacts, searchQuery, selectedGroup]);
+    return sortContacts(filtered, sortOption);
+  }, [contacts, searchQuery, selectedGroup, sortOption]);
   
   const isEditing = !!editingContact?.id;
 
@@ -188,6 +199,8 @@ export default function Home() {
     setIsScanDialogOpen(false);
   };
 
+  const availableSortOptions = getSortOptions(language);
+
   return (
     <>
       <div className="flex h-full flex-col">
@@ -203,15 +216,33 @@ export default function Home() {
 
         <main className="flex-1 overflow-hidden">
           <div className="p-4 space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder={t('search_placeholder')}
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder={t('search_placeholder')}
+                  className="pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <ListFilter className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>{t('sort_by_label')}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
+                    {availableSortOptions.map(option => (
+                      <DropdownMenuRadioItem key={option} value={option}>{t(`sort_${option}`)}</DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             {groups.length > 0 && (
                <ScrollArea className="w-full whitespace-nowrap">
@@ -241,7 +272,7 @@ export default function Home() {
           </div>
           <ScrollArea className="h-[calc(100vh-280px)] px-4 pb-4">
             <ContactList
-              contacts={filteredContacts}
+              contacts={filteredAndSortedContacts}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onAddNew={handleAddNew}

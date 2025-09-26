@@ -72,5 +72,13 @@
   "profile_updated_toast_title": "Perfil Atualizado",
   "profile_updated_ai_toast_desc": "A IA preencheu as novas informações. Por favor, revise e salve.",
   "save_failed_toast_title": "Falha ao Salvar",
-  "settings_title": "Configurações"
+  "settings_title": "Configurações",
+  "sort_by_label": "Ordenar por",
+  "sort_time": "Data (mais recentes)",
+  "sort_alphabetical": "Alfabético (A-Z)",
+  "sort_stroke": "Número de traços",
+  "sort_zhuyin": "Zhuyin",
+  "sort_gojuon": "Gojuon",
+  "sort_ganada": "Ganada",
+  "sort_cyrillic": "Cirílico (А-Я)"
 }

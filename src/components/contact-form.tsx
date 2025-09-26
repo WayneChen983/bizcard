@@ -107,6 +107,7 @@ export function ContactForm({ contact, groups, onSave, onDelete, isSaving }: Con
     
     const newContact: Contact = {
       id: contact?.id || '',
+      createdAt: contact?.createdAt || new Date().toISOString(),
       ...values,
       groups: values.groups || [],
       images: images,
@@ -364,6 +365,4 @@ export function ContactForm({ contact, groups, onSave, onDelete, isSaving }: Con
         onOpenChange={setIsScanDialogOpen}
         onScanComplete={handleScanComplete}
       />
-    </>
-  );
-}
+    </

@@ -1,6 +1,6 @@
-
 export type Contact = {
   id: string;
+  createdAt: string; // ISO 8601 date string
   name: string;
   company: string;
   jobTitle: string;
@@ -19,3 +19,5 @@ export type Group = {
   id: string;
   name: string;
 };
+
+export type SortOption = 'time' | 'alphabetical' | 'stroke' | 'zhuyin' | 'gojuon' | 'ganada' | 'cyrillic';

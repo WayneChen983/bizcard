@@ -1,4 +1,3 @@
-
 import type { Contact, Group } from '@/lib/types';
 
 export const initialGroups: Group[] = [
@@ -11,6 +10,7 @@ export const initialGroups: Group[] = [
 export const initialContacts: Contact[] = [
   {
     id: '1',
+    createdAt: '2023-10-26T10:00:00Z',
     name: '陳慶瑋',
     company: '國立台灣大學電機資訊學院',
     jobTitle: '電信工程學研究所通訊組',

@@ -75,5 +75,13 @@
   "delete_group_dialog_title": "Delete Group?",
   "delete_group_dialog_desc": "Are you sure you want to delete this group? Contacts in this group will not be deleted.",
   "all_groups_button": "All",
-  "loading_group": "Loading group..."
+  "loading_group": "Loading group...",
+  "sort_by_label": "Sort by",
+  "sort_time": "Time (Newest)",
+  "sort_alphabetical": "Alphabetical (A-Z)",
+  "sort_stroke": "Stroke count",
+  "sort_zhuyin": "Zhuyin",
+  "sort_gojuon": "Gojuon",
+  "sort_ganada": "Ganada",
+  "sort_cyrillic": "Cyrillic (А-Я)"
 }

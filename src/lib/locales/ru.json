@@ -1,4 +1,3 @@
-
 {
   "contact_list_title": "Контакты",
   "appearance_title": "Внешний вид",
@@ -72,5 +71,13 @@
   "profile_updated_toast_title": "Профиль обновлен",
   "profile_updated_ai_toast_desc": "ИИ заполнил новую информацию. Пожалуйста, просмотрите и сохраните.",
   "save_failed_toast_title": "Ошибка сохранения",
-  "settings_title": "Настройки"
+  "settings_title": "Настройки",
+  "sort_by_label": "Сортировать по",
+  "sort_time": "Времени (новые)",
+  "sort_alphabetical": "Алфавиту (A-Z)",
+  "sort_stroke": "Количеству черт",
+  "sort_zhuyin": "Чжуинь",
+  "sort_gojuon": "Годзюон",
+  "sort_ganada": "Канада",
+  "sort_cyrillic": "Кириллице (А-Я)"
 }

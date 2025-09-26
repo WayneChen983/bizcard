@@ -72,5 +72,13 @@
   "profile_updated_toast_title": "Profil mis à jour",
   "profile_updated_ai_toast_desc": "L'IA a rempli les nouvelles informations. Veuillez vérifier et enregistrer.",
   "save_failed_toast_title": "Échec de l'enregistrement",
-  "settings_title": "Paramètres"
+  "settings_title": "Paramètres",
+  "sort_by_label": "Trier par",
+  "sort_time": "Date (plus récents)",
+  "sort_alphabetical": "Alphabétique (A-Z)",
+  "sort_stroke": "Nombre de traits",
+  "sort_zhuyin": "Zhuyin",
+  "sort_gojuon": "Gojuon",
+  "sort_ganada": "Ganada",
+  "sort_cyrillic": "Cyrillique (А-Я)"
 }

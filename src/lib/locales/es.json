@@ -1,4 +1,3 @@
-
 {
   "contact_list_title": "Contactos",
   "appearance_title": "Apariencia",
@@ -72,5 +71,13 @@
   "profile_updated_toast_title": "Perfil Actualizado",
   "profile_updated_ai_toast_desc": "La IA ha rellenado la nueva información. Por favor, revisa y guarda.",
   "save_failed_toast_title": "Error al Guardar",
-  "settings_title": "Ajustes"
+  "settings_title": "Ajustes",
+  "sort_by_label": "Ordenar por",
+  "sort_time": "Fecha (más nuevos)",
+  "sort_alphabetical": "Alfabético (A-Z)",
+  "sort_stroke": "Número de trazos",
+  "sort_zhuyin": "Zhuyin",
+  "sort_gojuon": "Gojuon",
+  "sort_ganada": "Ganada",
+  "sort_cyrillic": "Cirílico (А-Я)"
 }

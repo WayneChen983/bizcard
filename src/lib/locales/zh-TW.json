@@ -75,5 +75,13 @@
   "delete_group_dialog_title": "刪除分類？",
   "delete_group_dialog_desc": "您確定要刪除此分類嗎？此分類中的聯絡人將不會被刪除。",
   "all_groups_button": "全部",
-  "loading_group": "正在載入分類..."
+  "loading_group": "正在載入分類...",
+  "sort_by_label": "排序方式",
+  "sort_time": "按時間排序 (最新)",
+  "sort_alphabetical": "按字母排序 (A-Z)",
+  "sort_stroke": "按筆劃排序",
+  "sort_zhuyin": "按注音排序",
+  "sort_gojuon": "按五十音排序",
+  "sort_ganada": "按가나다排序",
+  "sort_cyrillic": "按西里爾字母排序 (А-Я)"
 }

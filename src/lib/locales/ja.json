@@ -72,5 +72,13 @@
   "profile_updated_toast_title": "プロフィールが更新されました",
   "profile_updated_ai_toast_desc": "AIが新しい情報を入力しました。確認して保存してください。",
   "save_failed_toast_title": "保存に失敗しました",
-  "settings_title": "設定"
+  "settings_title": "設定",
+  "sort_by_label": "並べ替え",
+  "sort_time": "時間順 (新しい順)",
+  "sort_alphabetical": "アルファベット順 (A-Z)",
+  "sort_stroke": "画数順",
+  "sort_zhuyin": "注音順",
+  "sort_gojuon": "五十音順",
+  "sort_ganada": "カナダラ順",
+  "sort_cyrillic": "キリル文字順 (А-Я)"
 }

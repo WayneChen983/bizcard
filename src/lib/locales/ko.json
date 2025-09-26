@@ -72,5 +72,13 @@
   "profile_updated_toast_title": "프로필 업데이트됨",
   "profile_updated_ai_toast_desc": "AI가 새 정보를 입력했습니다. 검토 후 저장해주세요.",
   "save_failed_toast_title": "저장 실패",
-  "settings_title": "설정"
+  "settings_title": "설정",
+  "sort_by_label": "정렬 기준",
+  "sort_time": "시간순 (최신순)",
+  "sort_alphabetical": "알파벳순 (A-Z)",
+  "sort_stroke": "획순",
+  "sort_zhuyin": "주음 부호순",
+  "sort_gojuon": "오십음도순",
+  "sort_ganada": "가나다순",
+  "sort_cyrillic": "키릴 자모순 (А-Я)"
 }
