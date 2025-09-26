@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChevronLeft, Trash2 } from 'lucide-react';
@@ -122,7 +123,9 @@ const GroupsPage = () => {
               key={group.id}
               className="flex items-center justify-between rounded-lg bg-card p-4 border"
             >
-              <span>{group.name}</span>
+              <Link href={`/groups/${group.id}`} className="flex-1">
+                <span className="hover:underline">{group.name}</span>
+              </Link>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="ghost" size="icon">

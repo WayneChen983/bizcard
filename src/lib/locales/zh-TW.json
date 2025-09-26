@@ -74,5 +74,6 @@
   "group_deleted_toast_title": "已刪除分類",
   "delete_group_dialog_title": "刪除分類？",
   "delete_group_dialog_desc": "您確定要刪除此分類嗎？此分類中的聯絡人將不會被刪除。",
-  "all_groups_button": "全部"
+  "all_groups_button": "全部",
+  "loading_group": "正在載入分類..."
 }
