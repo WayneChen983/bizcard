@@ -32,6 +32,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useLanguage } from '@/context/language-context';
+import { Separator } from './ui/separator';
 
 export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactFormProps) {
   const { t } = useLanguage();
@@ -186,7 +187,10 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             )}
           />
 
-          <h3 className="font-semibold pt-2 border-t">{t('form_section_contact')}</h3>
+          <div className='space-y-2'>
+            <Separator />
+            <h3 className="font-semibold text-sm text-muted-foreground pt-2">{t('form_section_contact')}</h3>
+          </div>
           <FormField
             control={form.control}
             name="mobilePhone"
@@ -227,7 +231,10 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             )}
           />
 
-          <h3 className="font-semibold pt-2 border-t">{t('form_section_other')}</h3>
+          <div className='space-y-2'>
+            <Separator />
+            <h3 className="font-semibold text-sm text-muted-foreground pt-2">{t('form_section_other')}</h3>
+          </div>
           <FormField
             control={form.control}
             name="socialMedia"
@@ -268,7 +275,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
             )}
           />
 
-          <div className="flex justify-between gap-2 pt-4">
+          <div className="flex justify-between gap-4 pt-4">
              {contact && onDelete && isEditing && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>

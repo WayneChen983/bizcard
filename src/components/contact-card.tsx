@@ -3,8 +3,6 @@
 
 import type { Contact } from '@/lib/types';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
 
 interface ContactCardProps {
   contact: Contact;
@@ -15,7 +13,7 @@ interface ContactCardProps {
 export function ContactCard({ contact, onEdit }: ContactCardProps) {
   return (
     <div
-      className="flex cursor-pointer items-start gap-4 p-4 rounded-lg hover:bg-muted"
+      className="flex cursor-pointer items-start gap-4 p-4 rounded-lg hover:bg-muted active:scale-[0.98] transition-all duration-150"
       onClick={() => onEdit(contact)}
     >
       <div className="relative h-12 w-12 flex-shrink-0">

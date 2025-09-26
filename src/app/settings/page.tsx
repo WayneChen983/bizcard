@@ -47,10 +47,10 @@ const SettingsPage = () => {
         <div className="w-10"></div>
       </header>
       <main className="flex-1 overflow-y-auto p-4">
-        <div className="flex flex-col">
+        <div className="flex flex-col space-y-2">
           {settingsItems.map((item, index) => (
             <Link href={item.href} key={index}>
-              <div className="flex items-center justify-between rounded-md p-4 hover:bg-muted">
+              <div className="flex items-center justify-between rounded-lg p-4 transition-colors hover:bg-muted active:bg-slate-200">
                 <div className="flex items-center gap-4">
                   <item.icon className="h-6 w-6 text-muted-foreground" />
                   <span>{item.label}</span>
