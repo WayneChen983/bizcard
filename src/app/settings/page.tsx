@@ -13,12 +13,10 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import Link from 'next/link';
-import { useTheme } from '@/context/theme-context';
 
 const SettingsPage = () => {
   const router = useRouter();
   const { t } = useLanguage();
-  const { isThemeChanging } = useTheme();
 
   const settingsItems = [
     {
@@ -46,7 +44,7 @@ const SettingsPage = () => {
   return (
     <div className="flex h-full flex-col">
       <header className="sticky top-0 z-10 flex items-center border-b bg-background/80 p-2 backdrop-blur-sm">
-        <Button variant="ghost" size="icon" onClick={() => router.push('/')} disabled={isThemeChanging}>
+        <Button variant="ghost" size="icon" onClick={() => router.push('/')}>
           <ChevronLeft className="h-6 w-6" />
         </Button>
         <h1 className="mx-auto font-headline text-xl font-bold tracking-tight text-foreground">
