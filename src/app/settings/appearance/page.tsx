@@ -8,17 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
-import { ChevronLeft, Sun, Moon, Monitor, Check } from 'lucide-react';
+import { ChevronLeft, Sun, Moon, Monitor } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/context/theme-context';
-import { themes } from '@/lib/themes';
-
 
 const AppearancePage = () => {
   const router = useRouter();
   const { t } = useLanguage();
-  const { theme, setTheme, isThemeChanging } = useTheme();
   const [themeMode, setThemeMode] = useState('system');
   const [fontSize, setFontSize] = useState(16);
   const [mounted, setMounted] = useState(false);
@@ -116,33 +111,6 @@ const AppearancePage = () => {
                   {t('theme_system')}
                 </Label>
               </RadioGroup>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>色彩主題</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-4">
-              {themes.map((t) => (
-                <button
-                  key={t.name}
-                  onClick={() => setTheme(t.name)}
-                  disabled={isThemeChanging}
-                  className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all',
-                    theme === t.name ? 'border-primary' : 'border-transparent'
-                  )}
-                  aria-label={`Select ${t.name} theme`}
-                >
-                  <div
-                    className="h-8 w-8 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: t.color }}
-                  >
-                    {theme === t.name && <Check className="h-5 w-5 text-white" />}
-                  </div>
-                </button>
-              ))}
             </CardContent>
           </Card>
 

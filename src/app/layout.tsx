@@ -1,15 +1,13 @@
 
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { Metadata } from 'next';
 import { Inter, PT_Sans } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { LanguageProvider } from '@/context/language-context';
-import { ThemeProvider, useTheme } from '@/context/theme-context';
-import { Loader2 } from 'lucide-react';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -22,8 +20,26 @@ const fontHeadline = PT_Sans({
   variable: '--font-headline',
 });
 
-function AppContent({ children }: { children: React.ReactNode }) {
-  const { isThemeChanging } = useTheme();
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+
+  // set dark/light mode
+  useEffect(() => {
+    const storedThemeMode = localStorage.getItem('theme') || 'system';
+    if (
+      storedThemeMode === 'dark' ||
+      (storedThemeMode === 'system' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -47,25 +63,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
           </div>
           <Toaster />
         </LanguageProvider>
-
-        {isThemeChanging && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background/80 backdrop-blur-sm">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-          </div>
-        )}
       </body>
     </html>
-  );
-}
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <ThemeProvider>
-      <AppContent>{children}</AppContent>
-    </ThemeProvider>
   );
 }
