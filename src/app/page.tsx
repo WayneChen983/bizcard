@@ -21,7 +21,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { useLanguage } from '@/context/language-context';
 import { useRouter } from 'next/navigation';
-import { Navbar } from '@/components/navbar';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
@@ -49,7 +48,7 @@ export default function Home() {
       window.removeEventListener('newContactScan', handler);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [t, contacts]);
+  }, []);
 
   useEffect(() => {
     try {
@@ -101,6 +100,7 @@ export default function Home() {
     // Simulate async save
     setTimeout(() => {
       if (editingContact && contacts.some(c => c.id === contact.id)) {
+        // This is an existing contact being EDITED
         setContacts((prev) =>
           prev.map((c) => (c.id === contact.id ? contact : c))
         );
@@ -117,10 +117,11 @@ export default function Home() {
     }, 500);
   };
 
+  // This function is specifically for creating a NEW contact from a scan.
   const handleScanAndCreate = (scannedData: Partial<Contact>) => {
     const newContact: Contact = {
       ...scannedData,
-      id: scannedData.id || new Date().toISOString(),
+      id: new Date().toISOString(), // Always generate a new ID
       name: scannedData.name || '',
       company: scannedData.company || '',
       jobTitle: scannedData.jobTitle || '',
@@ -135,16 +136,14 @@ export default function Home() {
       images: scannedData.images || [],
     };
   
-    // Auto-save the contact immediately
-    setContacts((prev) => [newContact, ...prev]);
-  
-    // Open the sheet for optional editing
+    // We don't save it immediately. We open the sheet with the pre-filled data.
+    // The user can then review, edit, and save.
     setEditingContact(newContact);
     setIsSheetOpen(true);
   
     toast({
-      title: t('contact_autosaved_toast_title'),
-      description: t('contact_autosaved_toast_desc'),
+      title: t('scan_success_toast_title'),
+      description: t('contact_autosaved_toast_desc'), // "You can optionally edit the details"
     });
   };
   
@@ -158,7 +157,7 @@ export default function Home() {
     );
   }, [contacts, searchQuery]);
   
-  const isEditing = !!editingContact;
+  const isEditing = !!editingContact?.id;
 
   return (
     <>

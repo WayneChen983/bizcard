@@ -42,15 +42,13 @@ export function Navbar() {
       images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
     };
     
-    // Dispatch a specific event for creating a new contact
+    // Dispatch a specific event for creating a new contact, to be caught by the main page
     window.dispatchEvent(new CustomEvent('newContactScan', { detail: newContact }));
     setIsScanDialogOpen(false);
   };
   
-  const isMyCardPage = pathname.startsWith('/settings/profile');
-
-  // Hide scan button on any settings page including profile
-  const hideScanButton = isMyCardPage;
+  // The central scan button should only be visible on the main contacts page ('/').
+  const hideScanButton = pathname !== '/';
 
 
   return (
