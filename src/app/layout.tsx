@@ -37,16 +37,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  
-  const handleScanComplete = (newContact: Partial<Contact>) => {
-    // This logic has been moved to page.tsx to ensure separation of concerns.
-    // The onScanComplete prop is now passed directly from page.tsx to Navbar.tsx.
-  };
-
-  const pagesWithoutNavbar = ['/scan'];
-  const showNavbar = !pagesWithoutNavbar.includes(pathname);
-
 
   return (
     <html lang="en" suppressHydrationWarning>

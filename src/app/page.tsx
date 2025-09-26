@@ -143,80 +143,80 @@ export default function Home() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/80 p-4 backdrop-blur-sm">
-        <div className="w-10"></div>
-        <h1 className="font-headline text-xl font-bold tracking-tight text-foreground">
-          {t('contact_list_title')}
-        </h1>
-        <Button variant="ghost" size="icon" onClick={() => router.push('/settings')}>
-          <Settings className="h-6 w-6" />
-        </Button>
-      </header>
+      <div className="flex h-full flex-col">
+        <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/80 p-4 backdrop-blur-sm">
+          <div className="w-10"></div>
+          <h1 className="font-headline text-xl font-bold tracking-tight text-foreground">
+            {t('contact_list_title')}
+          </h1>
+          <Button variant="ghost" size="icon" onClick={() => router.push('/settings')}>
+            <Settings className="h-6 w-6" />
+          </Button>
+        </header>
 
-      <main className="flex-1 overflow-hidden">
-        <div className="p-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder={t('search_placeholder')}
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
-        <ScrollArea className="h-[calc(100vh-280px)] px-4 pb-4">
-          <ContactList
-            contacts={filteredContacts}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onAddNew={handleAddNew}
-          />
-        </ScrollArea>
-      </main>
-
-      <Sheet open={isSheetOpen} onOpenChange={(isOpen) => {
-          setIsSheetOpen(isOpen);
-          if (!isOpen) {
-            setEditingContact(null);
-          }
-        }}>
-        <SheetContent side="right" className="w-full max-w-md p-0">
-          <ScrollArea className="h-full">
-            {editingContact?.images?.[0] && (
-              <div className="relative aspect-[16/10] w-full">
-                <Image
-                  src={editingContact.images[0].url}
-                  alt={editingContact.images[0].alt || "Business card"}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            )}
-            <SheetHeader className="p-6">
-              <SheetTitle className="font-headline text-2xl">
-                {isEditing ? t('edit_contact_title') : t('add_contact_title')}
-              </SheetTitle>
-              <SheetDescription>
-                {isEditing
-                  ? t('edit_contact_desc')
-                  : t('add_contact_desc')}
-              </SheetDescription>
-            </SheetHeader>
-            <div className="px-6 pb-6">
-              <ContactForm
-                contact={editingContact}
-                onSave={handleSave}
-                onDelete={handleDelete}
-                isSaving={isSaving}
+        <main className="flex-1 overflow-hidden">
+          <div className="p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder={t('search_placeholder')}
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
+          </div>
+          <ScrollArea className="h-[calc(100vh-280px)] px-4 pb-4">
+            <ContactList
+              contacts={filteredContacts}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onAddNew={handleAddNew}
+            />
           </ScrollArea>
-        </SheetContent>
-      </Sheet>
-      {/* The Navbar is now rendered in layout.tsx but we pass the page-specific handler */}
-      <div style={{display: 'none'}}>
+        </main>
+
+        <Sheet open={isSheetOpen} onOpenChange={(isOpen) => {
+            setIsSheetOpen(isOpen);
+            if (!isOpen) {
+              setEditingContact(null);
+            }
+          }}>
+          <SheetContent side="right" className="w-full max-w-md p-0">
+            <ScrollArea className="h-full">
+              {editingContact?.images?.[0] && (
+                <div className="relative aspect-[16/10] w-full">
+                  <Image
+                    src={editingContact.images[0].url}
+                    alt={editingContact.images[0].alt || "Business card"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <SheetHeader className="p-6">
+                <SheetTitle className="font-headline text-2xl">
+                  {isEditing ? t('edit_contact_title') : t('add_contact_title')}
+                </SheetTitle>
+                <SheetDescription>
+                  {isEditing
+                    ? t('edit_contact_desc')
+                    : t('add_contact_desc')}
+                </SheetDescription>
+              </SheetHeader>
+              <div className="px-6 pb-6">
+                <ContactForm
+                  contact={editingContact}
+                  onSave={handleSave}
+                  onDelete={handleDelete}
+                  isSaving={isSaving}
+                />
+              </div>
+            </ScrollArea>
+          </SheetContent>
+        </Sheet>
+        
         <Navbar onScanComplete={handleScanAndSave} />
       </div>
     </>
