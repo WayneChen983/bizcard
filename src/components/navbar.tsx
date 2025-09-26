@@ -14,7 +14,7 @@ import { User, Settings } from 'lucide-react';
 import type { Contact } from '@/lib/types';
 
 
-export function Navbar() {
+export function Navbar({ onScanComplete }: { onScanComplete: (contact: Partial<Contact>) => void }) {
   const pathname = usePathname();
   const { t } = useLanguage();
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
@@ -42,8 +42,10 @@ export function Navbar() {
       images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
     };
     
-    // Dispatch a specific event for creating a new contact, to be caught by the main page
-    window.dispatchEvent(new CustomEvent('newContactScan', { detail: newContact }));
+    // Directly call the callback function passed from the layout.
+    if (onScanComplete) {
+      onScanComplete(newContact);
+    }
     setIsScanDialogOpen(false);
   };
   

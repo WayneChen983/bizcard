@@ -42,10 +42,10 @@ export default function Home() {
       handleScanAndSave(customEvent.detail);
     };
 
-    window.addEventListener('newContactScan', handler);
+    window.addEventListener('newContactCreated', handler);
 
     return () => {
-      window.removeEventListener('newContactScan', handler);
+      window.removeEventListener('newContactCreated', handler);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -118,29 +118,13 @@ export default function Home() {
   };
 
   // This function is specifically for creating a NEW contact from a scan and saving it automatically.
-  const handleScanAndSave = (scannedData: Partial<Contact>) => {
-    const newContact: Contact = {
-      id: new Date().toISOString(), // Always generate a new ID
-      name: scannedData.name || 'New Contact',
-      company: scannedData.company || '',
-      jobTitle: scannedData.jobTitle || '',
-      phone: scannedData.phone || '',
-      mobilePhone: scannedData.mobilePhone || '',
-      email: scannedData.email || '',
-      website: scannedData.website || '',
-      address: scannedData.address || '',
-      socialMedia: scannedData.socialMedia || '',
-      other: scannedData.other || '',
-      groups: [],
-      images: scannedData.images || [],
-    };
-  
+  const handleScanAndSave = (scannedData: Contact) => {
     // Save it immediately and add to the list
-    setContacts((prev) => [newContact, ...prev]);
+    setContacts((prev) => [scannedData, ...prev]);
   
     toast({
       title: t('contact_added_toast_title'),
-      description: `${newContact.name} ${t('contact_autosaved_toast_desc')}`,
+      description: `${scannedData.name} ${t('contact_autosaved_toast_desc')}`,
     });
   };
   
