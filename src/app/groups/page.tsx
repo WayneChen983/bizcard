@@ -86,6 +86,7 @@ const GroupsPage = () => {
             value={newGroupName}
             onChange={(e) => setNewGroupName(e.target.value)}
             placeholder={t('add_group_placeholder')}
+            onKeyDown={(e) => e.key === 'Enter' && handleAddGroup()}
           />
           <Button onClick={handleAddGroup}>{t('add_group_button')}</Button>
         </div>
