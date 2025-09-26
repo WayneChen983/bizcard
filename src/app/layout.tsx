@@ -61,7 +61,7 @@ export default function RootLayout({
     }
   };
 
-  const pagesWithoutNavbar = ['/scan', '/settings', '/settings/appearance', '/settings/language', '/settings/profile'];
+  const pagesWithoutNavbar = ['/scan'];
   const showNavbar = !pagesWithoutNavbar.includes(pathname);
 
 

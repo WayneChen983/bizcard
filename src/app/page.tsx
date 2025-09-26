@@ -15,15 +15,17 @@ import {
 } from '@/components/ui/sheet';
 import { ContactForm } from '@/components/contact-form';
 import { ContactList } from '@/components/contact-list';
-import { Search } from 'lucide-react';
+import { Search, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { useLanguage } from '@/context/language-context';
+import { useRouter } from 'next/navigation';
 
 const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
 
 export default function Home() {
+  const router = useRouter();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
@@ -148,11 +150,13 @@ export default function Home() {
   return (
     <>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/80 p-4 backdrop-blur-sm">
+        <div className="w-10"></div>
         <h1 className="font-headline text-xl font-bold tracking-tight text-foreground">
           {t('contact_list_title')}
         </h1>
-        {/* Placeholder for potential future actions */}
-        <div className="w-10"></div>
+        <Button variant="ghost" size="icon" onClick={() => router.push('/settings')}>
+          <Settings className="h-6 w-6" />
+        </Button>
       </header>
 
       <main className="flex-1 overflow-hidden">

@@ -9,7 +9,6 @@ import {
   Palette,
   Globe,
   Info,
-  User,
 } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import Link from 'next/link';
@@ -19,11 +18,6 @@ const SettingsPage = () => {
   const { t } = useLanguage();
 
   const settingsItems = [
-    {
-      href: '/settings/profile',
-      icon: User,
-      label: t('my_card_title'),
-    },
     {
       href: '/settings/appearance',
       icon: Palette,
