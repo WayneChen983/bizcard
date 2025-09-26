@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/context/language-context';
-import { Settings } from 'lucide-react';
+import { Folder } from 'lucide-react';
 
 
 interface NavbarProps {
@@ -21,7 +21,7 @@ export function Navbar({ onScanClick }: NavbarProps) {
   const navItems = [
     { href: '/', label: t('nav_contacts'), icon: Icons.home },
     { href: '#scan', label: t('nav_scan'), icon: Icons.camera, isCentral: true },
-    { href: '/settings', label: t('nav_settings'), icon: Settings },
+    { href: '/groups', label: t('nav_groups'), icon: Folder },
   ];
   
   const hideScanButton = pathname !== '/';

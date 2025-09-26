@@ -2,8 +2,8 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import type { Contact } from '@/lib/types';
-import { initialContacts } from '@/lib/contacts-data';
+import type { Contact, Group } from '@/lib/types';
+import { initialContacts, initialGroups } from '@/lib/contacts-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/sheet';
 import { ContactForm } from '@/components/contact-form';
 import { ContactList } from '@/components/contact-list';
-import { Search, Settings } from 'lucide-react';
+import { Search, Settings, Folder } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
@@ -24,13 +24,17 @@ import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/navbar';
 import { ScanCardDialog } from '@/components/scan-card-dialog';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
+import { Badge } from '@/components/ui/badge';
 
-const LOCAL_STORAGE_KEY = 'bizcard-pro-contacts';
+const CONTACTS_STORAGE_KEY = 'bizcard-pro-contacts';
+const GROUPS_STORAGE_KEY = 'bizcard-pro-groups';
 
 export default function Home() {
   const router = useRouter();
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -38,18 +42,26 @@ export default function Home() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
-  
+
   useEffect(() => {
     try {
-      const storedContacts = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const storedContacts = localStorage.getItem(CONTACTS_STORAGE_KEY);
       if (storedContacts) {
         setContacts(JSON.parse(storedContacts));
       } else {
         setContacts(initialContacts);
       }
+
+      const storedGroups = localStorage.getItem(GROUPS_STORAGE_KEY);
+      if (storedGroups) {
+        setGroups(JSON.parse(storedGroups));
+      } else {
+        setGroups(initialGroups);
+      }
     } catch (error) {
-      console.error('Failed to load contacts from localStorage', error);
+      console.error('Failed to load data from localStorage', error);
       setContacts(initialContacts);
+      setGroups(initialGroups);
     }
     setIsInitialized(true);
   }, []);
@@ -57,12 +69,13 @@ export default function Home() {
   useEffect(() => {
     if (isInitialized) {
       try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
+        localStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(contacts));
+        localStorage.setItem(GROUPS_STORAGE_KEY, JSON.stringify(groups));
       } catch (error) {
-        console.error('Failed to save contacts to localStorage', error);
+        console.error('Failed to save data to localStorage', error);
       }
     }
-  }, [contacts, isInitialized]);
+  }, [contacts, groups, isInitialized]);
 
   const handleAddNew = () => {
     setEditingContact(null);
@@ -89,13 +102,11 @@ export default function Home() {
     // Simulate async save
     setTimeout(() => {
       if (editingContact && contacts.some(c => c.id === contact.id)) {
-        // This is an existing contact being EDITED
         setContacts((prev) =>
           prev.map((c) => (c.id === contact.id ? contact : c))
         );
         toast({ title: t('contact_updated_toast_title') });
       } else {
-        // This handles new contacts created manually
         const newContact = { ...contact, id: contact.id || new Date().toISOString() };
         setContacts((prev) => [newContact, ...prev]);
         toast({ title: t('contact_added_toast_title') });
@@ -106,11 +117,10 @@ export default function Home() {
     }, 500);
   };
 
-  // This function is specifically for creating a NEW contact from a scan and saving it automatically.
   const handleScanAndSave = useCallback((scannedData: Partial<Contact>) => {
     const newContact: Contact = {
       id: new Date().toISOString(),
-      name: scannedData.name || 'New Contact',
+      name: scannedData.name || t('new_contact_default_name'),
       company: scannedData.company || '',
       jobTitle: scannedData.jobTitle || '',
       phone: scannedData.phone || '',
@@ -133,14 +143,25 @@ export default function Home() {
   }, [t]);
   
   const filteredContacts = useMemo(() => {
-    if (!searchQuery) return contacts;
-    return contacts.filter(
-      (contact) =>
-        contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        contact.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        contact.email?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [contacts, searchQuery]);
+    let filtered = contacts;
+
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (contact) =>
+          contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          contact.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          contact.email?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (selectedGroup) {
+      filtered = filtered.filter((contact) =>
+        contact.groups.includes(selectedGroup)
+      );
+    }
+
+    return filtered;
+  }, [contacts, searchQuery, selectedGroup]);
   
   const isEditing = !!editingContact?.id;
 
@@ -164,7 +185,7 @@ export default function Home() {
       images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
     };
     handleScanAndSave(newContact);
-    setIsScanDialogOpen(false); // Close dialog after scan
+    setIsScanDialogOpen(false);
   };
 
   return (
@@ -181,7 +202,7 @@ export default function Home() {
         </header>
 
         <main className="flex-1 overflow-hidden">
-          <div className="p-4">
+          <div className="p-4 space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
@@ -192,6 +213,31 @@ export default function Home() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
+            {groups.length > 0 && (
+               <ScrollArea className="w-full whitespace-nowrap">
+                <div className="flex gap-2 pb-2">
+                    <Button
+                      variant={selectedGroup === null ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedGroup(null)}
+                      className="rounded-full"
+                    >
+                      {t('all_groups_button')}
+                    </Button>
+                    {groups.map((group) => (
+                      <Button
+                        key={group.id}
+                        variant={selectedGroup === group.id ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSelectedGroup(group.id)}
+                        className="rounded-full"
+                      >
+                        {group.name}
+                      </Button>
+                    ))}
+                  </div>
+               </ScrollArea>
+            )}
           </div>
           <ScrollArea className="h-[calc(100vh-280px)] px-4 pb-4">
             <ContactList
@@ -234,6 +280,7 @@ export default function Home() {
               <div className="px-6 pb-6">
                 <ContactForm
                   contact={editingContact}
+                  groups={groups}
                   onSave={handleSave}
                   onDelete={handleDelete}
                   isSaving={isSaving}

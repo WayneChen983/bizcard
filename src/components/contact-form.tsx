@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import type { Contact } from '@/lib/types';
+import type { Contact, Group } from '@/lib/types';
 import { Loader2, Trash2, ScanLine } from 'lucide-react';
 import type { ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
 import { ScanCardDialog } from './scan-card-dialog';
@@ -33,37 +33,39 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useLanguage } from '@/context/language-context';
 import { Separator } from './ui/separator';
+import { Checkbox } from './ui/checkbox';
 
-export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactFormProps) {
+const formSchema = z.object({
+  name: z.string().min(1, { message: 'Name is required' }),
+  company: z.string().optional(),
+  jobTitle: z.string().optional(),
+  phone: z.string().optional(),
+  mobilePhone: z.string().optional(),
+  email: z.string().email({ message: 'Invalid email address' }).optional().or(z.literal('')),
+  website: z.string().url({ message: 'Invalid URL' }).optional().or(z.literal('')),
+  address: z.string().optional(),
+  socialMedia: z.string().optional(),
+  other: z.string().optional(),
+  groups: z.array(z.string()).optional(),
+});
+
+type ContactFormValues = z.infer<typeof formSchema>;
+
+interface ContactFormProps {
+  contact?: Contact | null;
+  groups: Group[];
+  onSave: (contact: Contact) => void;
+  onDelete?: (id: string) => void;
+  isSaving: boolean;
+}
+
+export function ContactForm({ contact, groups, onSave, onDelete, isSaving }: ContactFormProps) {
   const { t } = useLanguage();
-
-  const formSchema = z.object({
-    name: z.string().min(1, { message: t('validation_name_required') }),
-    company: z.string().optional(),
-    jobTitle: z.string().optional(),
-    phone: z.string().optional(),
-    mobilePhone: z.string().optional(),
-    email: z.string().email({ message: t('validation_email_invalid') }).optional().or(z.literal('')),
-    website: z.string().url({ message: t('validation_website_invalid') }).optional().or(z.literal('')),
-    address: z.string().optional(),
-    socialMedia: z.string().optional(),
-    other: z.string().optional(),
-  });
-  
-  type ContactFormValues = z.infer<typeof formSchema>;
-  
-  interface ContactFormProps {
-    contact?: Contact | null;
-    onSave: (contact: Contact) => void;
-    onDelete?: (id: string) => void;
-    isSaving: boolean;
-  }
-
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: contact || {
+    defaultValues: {
       name: '',
       company: '',
       jobTitle: '',
@@ -74,30 +76,31 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
       address: '',
       socialMedia: '',
       other: '',
+      groups: [],
     },
   });
 
   useEffect(() => {
-    form.reset(contact || {
-      name: '',
-      company: '',
-      jobTitle: '',
-      phone: '',
-      mobilePhone: '',
-      email: '',
-      website: '',
-      address: '',
-      socialMedia: '',
-      other: '',
-    });
+    const defaultValues = {
+      name: contact?.name || '',
+      company: contact?.company || '',
+      jobTitle: contact?.jobTitle || '',
+      phone: contact?.phone || '',
+      mobilePhone: contact?.mobilePhone || '',
+      email: contact?.email || '',
+      website: contact?.website || '',
+      address: contact?.address || '',
+      socialMedia: contact?.socialMedia || '',
+      other: contact?.other || '',
+      groups: contact?.groups || [],
+    };
+    form.reset(defaultValues);
   }, [contact, form]);
 
 
   function onSubmit(values: ContactFormValues) {
     let images = contact?.images || [];
 
-    // If a new image was scanned (passed via contact prop but not yet saved)
-    // and it's not already in the images array, add it.
     if (contact?.images?.[0] && !images.some(img => img.url === contact.images?.[0].url)) {
       images = [...contact.images, ...images];
     }
@@ -105,7 +108,7 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
     const newContact: Contact = {
       id: contact?.id || '',
       ...values,
-      groups: contact?.groups || [],
+      groups: values.groups || [],
       images: images,
     };
     onSave(newContact);
@@ -274,6 +277,58 @@ export function ContactForm({ contact, onSave, onDelete, isSaving }: ContactForm
               </FormItem>
             )}
           />
+
+          {groups.length > 0 && (
+            <div className="space-y-2">
+              <Separator />
+              <h3 className="font-semibold text-sm text-muted-foreground pt-2">{t('form_section_groups')}</h3>
+              <FormField
+                control={form.control}
+                name="groups"
+                render={() => (
+                  <FormItem className="space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      {groups.map((group) => (
+                        <FormField
+                          key={group.id}
+                          control={form.control}
+                          name="groups"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={group.id}
+                                className="flex flex-row items-start space-x-3 space-y-0"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(group.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...(field.value || []), group.id])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== group.id
+                                            )
+                                          )
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {group.name}
+                                </FormLabel>
+                              </FormItem>
+                            )
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
 
           <div className="flex justify-between gap-4 pt-4">
              {contact && onDelete && isEditing && (

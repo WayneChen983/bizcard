@@ -1,5 +1,12 @@
 
-import type { Contact } from '@/lib/types';
+import type { Contact, Group } from '@/lib/types';
+
+export const initialGroups: Group[] = [
+  { id: '1', name: 'Clients' },
+  { id: '2', name: 'Networking' },
+  { id: '3', name: 'Vendors' },
+];
+
 
 export const initialContacts: Contact[] = [
   {
@@ -14,7 +21,7 @@ export const initialContacts: Contact[] = [
     address: '台北市大安區羅斯福路四段1號',
     socialMedia: 'goup4you',
     other: '博理館515',
-    groups: ['networking', 'clients'],
+    groups: ['2'],
     images: [
       { url: "https://picsum.photos/seed/card-front/800/500", alt: "Business card front" },
       { url: "https://picsum.photos/seed/map/200/200", alt: "Map" },

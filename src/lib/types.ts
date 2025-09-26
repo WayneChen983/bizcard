@@ -14,3 +14,8 @@ export type Contact = {
   groups: string[];
   images?: { url: string; alt?: string }[];
 };
+
+export type Group = {
+  id: string;
+  name: string;
+};
