@@ -39,7 +39,7 @@ export default function Home() {
     // This effect now specifically listens for events to CREATE a new contact.
     const handler = (event: Event) => {
       const customEvent = event as CustomEvent<Contact>;
-      handleScanAndCreate(customEvent.detail);
+      handleScanAndSave(customEvent.detail);
     };
 
     window.addEventListener('newContactScan', handler);
@@ -106,7 +106,7 @@ export default function Home() {
         );
         toast({ title: t('contact_updated_toast_title') });
       } else {
-        // This handles both new contacts created via scanning and manually
+        // This handles new contacts created manually
         const newContact = { ...contact, id: contact.id || new Date().toISOString() };
         setContacts((prev) => [newContact, ...prev]);
         toast({ title: t('contact_added_toast_title') });
@@ -117,12 +117,11 @@ export default function Home() {
     }, 500);
   };
 
-  // This function is specifically for creating a NEW contact from a scan.
-  const handleScanAndCreate = (scannedData: Partial<Contact>) => {
+  // This function is specifically for creating a NEW contact from a scan and saving it automatically.
+  const handleScanAndSave = (scannedData: Partial<Contact>) => {
     const newContact: Contact = {
-      ...scannedData,
       id: new Date().toISOString(), // Always generate a new ID
-      name: scannedData.name || '',
+      name: scannedData.name || 'New Contact',
       company: scannedData.company || '',
       jobTitle: scannedData.jobTitle || '',
       phone: scannedData.phone || '',
@@ -136,14 +135,12 @@ export default function Home() {
       images: scannedData.images || [],
     };
   
-    // We don't save it immediately. We open the sheet with the pre-filled data.
-    // The user can then review, edit, and save.
-    setEditingContact(newContact);
-    setIsSheetOpen(true);
+    // Save it immediately and add to the list
+    setContacts((prev) => [newContact, ...prev]);
   
     toast({
-      title: t('scan_success_toast_title'),
-      description: t('contact_autosaved_toast_desc'), // "You can optionally edit the details"
+      title: t('contact_added_toast_title'),
+      description: `${newContact.name} ${t('contact_autosaved_toast_desc')}`,
     });
   };
   

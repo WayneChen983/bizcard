@@ -14,7 +14,7 @@
   "contact_updated_toast_title": "Contact Updated",
   "contact_added_toast_title": "Contact Added",
   "contact_autosaved_toast_title": "Contact Auto-Saved",
-  "contact_autosaved_toast_desc": "You can optionally edit the details.",
+  "contact_autosaved_toast_desc": "was automatically saved to your contacts.",
   "scan_card_button": "Scan Business Card to Autofill",
   "form_label_name": "Name",
   "form_label_company": "Company",
