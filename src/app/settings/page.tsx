@@ -9,6 +9,7 @@ import {
   Palette,
   Globe,
   Info,
+  Shield,
 } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import Link from 'next/link';
@@ -27,6 +28,11 @@ const SettingsPage = () => {
       href: '/settings/language',
       icon: Globe,
       label: t('language_title'),
+    },
+    {
+      href: '/privacy',
+      icon: Shield,
+      label: t('privacy_policy_title'),
     },
     {
       href: '/about', // Assuming an about page might exist or be created
