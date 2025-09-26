@@ -20,6 +20,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose
+} from '@/components/ui/dialog';
 
 const GROUPS_STORAGE_KEY = 'bizcard-pro-groups';
 
@@ -29,6 +38,7 @@ const GroupsPage = () => {
   const { toast } = useToast();
   const [groups, setGroups] = useState<Group[]>([]);
   const [newGroupName, setNewGroupName] = useState('');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -59,6 +69,7 @@ const GroupsPage = () => {
     setGroups(updatedGroups);
     saveGroups(updatedGroups);
     setNewGroupName('');
+    setIsAddDialogOpen(false);
     toast({ title: t('group_added_toast_title') });
   };
 
@@ -81,15 +92,30 @@ const GroupsPage = () => {
         <div className="w-10"></div>
       </header>
       <main className="flex-1 overflow-y-auto p-4">
-        <div className="flex gap-2">
-          <Input
-            value={newGroupName}
-            onChange={(e) => setNewGroupName(e.target.value)}
-            placeholder={t('add_group_placeholder')}
-            onKeyDown={(e) => e.key === 'Enter' && handleAddGroup()}
-          />
-          <Button onClick={handleAddGroup}>{t('add_group_button')}</Button>
-        </div>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="w-full">{t('add_group_button')}</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t('add_group_button')}</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                value={newGroupName}
+                onChange={(e) => setNewGroupName(e.target.value)}
+                placeholder={t('add_group_placeholder')}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddGroup()}
+              />
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">{t('cancel_button')}</Button>
+              </DialogClose>
+              <Button onClick={handleAddGroup}>{t('add_group_button')}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <div className="mt-6 flex flex-col gap-2">
           {groups.map((group) => (
             <div
