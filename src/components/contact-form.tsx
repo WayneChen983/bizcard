@@ -365,4 +365,8 @@ export function ContactForm({ contact, groups, onSave, onDelete, isSaving }: Con
         onOpenChange={setIsScanDialogOpen}
         onScanComplete={handleScanComplete}
       />
-    </
+    </>
+  );
+}
+
+    
