@@ -29,7 +29,6 @@ const GroupsPage = () => {
   const { toast } = useToast();
   const [groups, setGroups] = useState<Group[]>([]);
   const [newGroupName, setNewGroupName] = useState('');
-  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     try {
@@ -40,18 +39,15 @@ const GroupsPage = () => {
     } catch (error) {
       console.error('Failed to load groups from localStorage', error);
     }
-    setIsInitialized(true);
   }, []);
 
-  useEffect(() => {
-    if (isInitialized) {
-      try {
-        localStorage.setItem(GROUPS_STORAGE_KEY, JSON.stringify(groups));
-      } catch (error) {
-        console.error('Failed to save groups to localStorage', error);
-      }
+  const saveGroups = (updatedGroups: Group[]) => {
+    try {
+      localStorage.setItem(GROUPS_STORAGE_KEY, JSON.stringify(updatedGroups));
+    } catch (error) {
+      console.error('Failed to save groups to localStorage', error);
     }
-  }, [groups, isInitialized]);
+  };
 
   const handleAddGroup = () => {
     if (newGroupName.trim() === '') return;
@@ -59,13 +55,17 @@ const GroupsPage = () => {
       id: new Date().toISOString(),
       name: newGroupName.trim(),
     };
-    setGroups((prev) => [...prev, newGroup]);
+    const updatedGroups = [...groups, newGroup];
+    setGroups(updatedGroups);
+    saveGroups(updatedGroups);
     setNewGroupName('');
     toast({ title: t('group_added_toast_title') });
   };
 
   const handleDeleteGroup = (id: string) => {
-    setGroups((prev) => prev.filter((group) => group.id !== id));
+    const updatedGroups = groups.filter((group) => group.id !== id);
+    setGroups(updatedGroups);
+    saveGroups(updatedGroups);
     toast({ title: t('group_deleted_toast_title') });
   };
 
