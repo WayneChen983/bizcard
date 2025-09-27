@@ -1,19 +1,19 @@
 {
   "name": "BizCard Pro",
-  "short_name": "BizCard Pro",
-  "description": "A business card management app.",
+  "short_name": "BizCardPro",
+  "description": "A business card management PWA",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#7661dc",
+  "theme_color": "#2509b4",
   "icons": [
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
