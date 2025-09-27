@@ -29,16 +29,38 @@ export default function RootLayout({
 
   // set dark/light mode
   useEffect(() => {
+    const applyTheme = (theme: string) => {
+      const isDarkMode =
+        theme === 'dark' ||
+        (theme === 'system' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
+      document.documentElement.classList.toggle('dark', isDarkMode);
+
+      // Update theme-color meta tag for PWA
+      const themeColor = isDarkMode ? 'hsl(210 10% 10%)' : 'hsl(208 100% 97.1%)';
+      let themeColorMeta = document.querySelector('meta[name="theme-color"]');
+      if (!themeColorMeta) {
+        themeColorMeta = document.createElement('meta');
+        themeColorMeta.setAttribute('name', 'theme-color');
+        document.head.appendChild(themeColorMeta);
+      }
+      themeColorMeta.setAttribute('content', themeColor);
+    };
+
     const storedThemeMode = localStorage.getItem('theme') || 'system';
-    if (
-      storedThemeMode === 'dark' ||
-      (storedThemeMode === 'system' &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches)
-    ) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    applyTheme(storedThemeMode);
+
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      const currentTheme = localStorage.getItem('theme') || 'system';
+      if (currentTheme === 'system') {
+        applyTheme('system');
+      }
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
 
