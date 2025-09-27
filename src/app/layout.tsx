@@ -68,7 +68,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <title>BizCard Pro</title>
-        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body
