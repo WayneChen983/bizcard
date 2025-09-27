@@ -1,17 +1,16 @@
 {
   "name": "BizCard Pro",
-  "short_name": "BizCard",
-  "description": "A smart business card manager.",
-  "start_url": "/",
+  "short_name": "BizCardPro",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#f97316",
+  "theme_color": "#000000",
+  "description": "A professional business card management app.",
   "icons": [
     {
-      "src": "/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     }
   ]
 }
