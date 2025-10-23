@@ -105,7 +105,7 @@ export default function Home() {
       updatedAt: serverTimestamp(),
     };
 
-    if (editingContact && contacts.some(c => c.id === contact.id)) {
+    if (editingContact && contacts && contacts.some(c => c.id === contact.id)) {
       const contactDocRef = doc(firestore, 'users', user.uid, 'contacts', contact.id);
       const { id, ...contactData } = contactWithTimestamp;
       setDocumentNonBlocking(contactDocRef, contactData, { merge: true });
@@ -295,7 +295,7 @@ export default function Home() {
               <div className="px-6 pb-6">
                 <ContactForm
                   contact={editingContact}
-                  groups={groups}
+                  groups={groups || []}
                   onSave={handleSave}
                   onDelete={handleDelete}
                   isSaving={isSaving}
@@ -315,5 +315,3 @@ export default function Home() {
     </>
   );
 }
-
-    

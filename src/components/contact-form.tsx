@@ -135,6 +135,7 @@ export function ContactForm({ contact, groups, onSave, onDelete, isSaving }: Con
       }
     }
     form.reset(newValues);
+    setIsScanDialogOpen(false);
   };
 
   const handleDelete = () => {
@@ -289,7 +290,7 @@ export function ContactForm({ contact, groups, onSave, onDelete, isSaving }: Con
             )}
           />
 
-          {groups.length > 0 && (
+          {groups && groups.length > 0 && (
             <div className="space-y-2">
               <Separator />
               <h3 className="font-semibold text-sm text-muted-foreground pt-2">{t('form_section_groups')}</h3>
