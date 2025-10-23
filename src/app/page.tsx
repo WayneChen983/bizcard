@@ -126,8 +126,8 @@ export default function Home() {
       setEditingContact(null);
     }, 500);
   };
-
-  const handleScanAndSave = useCallback((scannedData: Partial<Contact>) => {
+  
+  const handleHomePageScanComplete = useCallback((scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
     const newContact: Contact = {
       id: new Date().toISOString(),
       createdAt: new Date().toISOString(),
@@ -142,7 +142,7 @@ export default function Home() {
       socialMedia: scannedData.socialMedia || '',
       other: scannedData.other || '',
       groups: [],
-      images: scannedData.images || [],
+      images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
     };
 
     setContacts((prev) => [newContact, ...prev]);
@@ -151,6 +151,7 @@ export default function Home() {
       title: t('contact_added_toast_title'),
       description: `${newContact.name} ${t('contact_autosaved_toast_desc')}`,
     });
+    setIsScanDialogOpen(false);
   }, [t]);
   
   const filteredAndSortedContacts = useMemo(() => {
@@ -178,25 +179,6 @@ export default function Home() {
 
   const handleNavbarScanClick = () => {
     setIsScanDialogOpen(true);
-  };
-
-  const handleHomePageScanComplete = (scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
-    const newContact: Partial<Contact> = {
-      name: scannedData.name || '',
-      company: scannedData.company || '',
-      jobTitle: scannedData.jobTitle || '',
-      phone: scannedData.phone || '',
-      mobilePhone: scannedData.mobilePhone || '',
-      email: scannedData.email || '',
-      website: scannedData.website || '',
-      address: scannedData.address || '',
-      socialMedia: scannedData.socialMedia || '',
-      other: scannedData.other || '',
-      groups: [],
-      images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
-    };
-    handleScanAndSave(newContact);
-    setIsScanDialogOpen(false);
   };
 
   const availableSortOptions = getSortOptions(language);
