@@ -127,7 +127,7 @@ export default function Home() {
     }, 500);
   };
   
-  const handleHomePageScanComplete = (scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
+  const handleHomePageScanComplete = useCallback((scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
     const newContact: Contact = {
       id: new Date().toISOString(),
       createdAt: new Date().toISOString(),
@@ -145,14 +145,14 @@ export default function Home() {
       images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
     };
 
-    setContacts((prev) => [newContact, ...prev]);
+    setContacts(prevContacts => [newContact, ...prevContacts]);
   
     toast({
       title: t('contact_added_toast_title'),
       description: `${newContact.name} ${t('contact_autosaved_toast_desc')}`,
     });
     setIsScanDialogOpen(false);
-  };
+  }, [t]);
   
   const filteredAndSortedContacts = useMemo(() => {
     let filtered = contacts;
