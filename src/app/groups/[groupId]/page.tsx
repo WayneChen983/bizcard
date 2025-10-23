@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -43,9 +43,12 @@ const GroupDetailPage = () => {
     const currentContact = allContacts.find(c => c.id === contactId);
     if (!currentContact) return;
 
+    // Ensure 'groups' property exists and is an array
+    const currentGroups = Array.isArray(currentContact.groups) ? currentContact.groups : [];
+
     const newGroups = inGroup
-      ? currentContact.groups.filter(gid => gid !== groupId)
-      : [...currentContact.groups, groupId as string];
+      ? currentGroups.filter(gid => gid !== groupId)
+      : [...currentGroups, groupId as string];
     
     updateDocumentNonBlocking(contactRef, { groups: newGroups });
   };
@@ -101,7 +104,7 @@ const GroupDetailPage = () => {
         <ScrollArea className="h-full">
             <div className="p-4 flex flex-col gap-1">
             {allContacts.map(contact => {
-                const isInGroup = contact.groups?.includes(group.id);
+                const isInGroup = Array.isArray(contact.groups) && contact.groups.includes(group.id);
                 return (
                 <div
                     key={contact.id}
@@ -130,3 +133,5 @@ const GroupDetailPage = () => {
 };
 
 export default GroupDetailPage;
+
+    

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -50,7 +50,7 @@ const GroupsPage = () => {
     if (!user) return null;
     return collection(firestore, 'users', user.uid, 'groups');
   }, [firestore, user]);
-  const { data: groups, isLoading: groupsLoading } = useCollection<Group>(groupsQuery);
+  const { data: groups = [], isLoading: groupsLoading } = useCollection<Group>(groupsQuery);
 
 
   const handleAddGroup = () => {
@@ -153,3 +153,5 @@ const GroupsPage = () => {
 };
 
 export default GroupsPage;
+
+    

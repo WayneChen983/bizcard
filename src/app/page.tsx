@@ -153,7 +153,7 @@ export default function Home() {
       description: `${newContactData.name} ${t('contact_autosaved_toast_desc')}`,
     });
     setIsScanDialogOpen(false);
-  }, [user, firestore, t]);
+  }, [user, firestore, t, toast]);
   
   const filteredAndSortedContacts = useMemo(() => {
     let filtered = contacts || [];
@@ -315,3 +315,5 @@ export default function Home() {
     </>
   );
 }
+
+    
