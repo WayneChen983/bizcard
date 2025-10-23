@@ -1,0 +1,134 @@
+╔══════════════════════════════════════════════════════════╗
+║          BizCard Pro - 快速啟動指引                      ║
+╚══════════════════════════════════════════════════════════╝
+
+📋 現在狀態
+-----------
+✅ 專案已設定完成
+✅ 依賴套件已安裝
+✅ .env.local 環境檔案已建立
+✅ 程式碼已修改為讀取 API Key
+✅ Google 登入功能已整合
+✅ 登入頁面已建立
+
+⚠️  還需完成兩步：
+   1. 填入 Google AI API Key
+   2. 在 Firebase 啟用 Google 登入
+
+
+🔑 步驟 1：填入 API Key
+-----------------------
+1. 用記事本或 VSCode 開啟這個檔案：
+   C:\Users\bl515-pub\Desktop\BizCard_Pro\bizcard\.env.local
+
+2. 找到這一行：
+   GOOGLE_API_KEY=your_api_key_here
+
+3. 把 your_api_key_here 替換成你的真實 API Key：
+   GOOGLE_API_KEY=AIzaSy...你的key...
+
+4. 儲存檔案
+
+
+🔧 步驟 2：設定 Firebase Google 登入
+-------------------------------------
+1. 前往 Firebase Console：
+   https://console.firebase.google.com/
+
+2. 選擇專案：studio-1552242347-abca1
+
+3. 左側選單點擊 "Authentication"（身份驗證）
+
+4. 點擊 "Sign-in method"（登入方法）標籤
+
+5. 找到 "Google"，點擊編輯
+
+6. 啟用開關，填入支援電子郵件，點擊儲存
+
+7. （可選）部署 Firestore 規則：
+   firebase deploy --only firestore:rules
+
+詳細說明：GOOGLE_AUTH_SETUP.md
+
+
+🚀 步驟 3：啟動應用程式
+-----------------------
+選擇以下任一方式：
+
+【方式 A - 使用快速啟動腳本（推薦）】
+在 PowerShell 執行：
+  cd C:\Users\bl515-pub\Desktop\BizCard_Pro\bizcard
+  .\start-app.ps1
+
+【方式 B - 手動啟動】
+在終端機執行：
+  cd C:\Users\bl515-pub\Desktop\BizCard_Pro\bizcard
+  npm run dev
+
+
+🌐 步驟 4：開啟瀏覽器
+---------------------
+啟動成功後，在瀏覽器開啟：
+  → http://localhost:9002/login
+
+第一次使用會看到登入頁面：
+  • 使用 Google 登入（推薦）
+  • 或以訪客身份繼續
+
+
+📱 使用提示
+-----------
+• 首頁：瀏覽所有聯絡人
+• 點擊底部「掃描」圖示：使用 AI 掃描名片
+• 點擊「+」按鈕：手動新增聯絡人
+• 點擊聯絡人卡片：編輯或查看詳情
+• 右上角設定：切換語言、主題等
+
+
+🆘 遇到問題？
+-------------
+1. 看到 "Missing GOOGLE_API_KEY" 錯誤
+   → 確認 .env.local 中的 API Key 已正確填入
+   → 重新啟動開發伺服器
+
+2. 看到 "Missing script: dev" 錯誤
+   → 確認你在 bizcard 資料夾內執行指令
+   → 執行：cd C:\Users\bl515-pub\Desktop\BizCard_Pro\bizcard
+
+3. Port 9002 已被占用
+   → 修改 package.json 中的 dev 指令，改用其他 port
+   → 或關閉占用 9002 的程式
+
+4. 相機無法啟動
+   → 確認瀏覽器已授予相機權限
+   → 使用 HTTPS 或 localhost (HTTP 也可用於本機)
+
+
+📚 更多資訊
+-----------
+• 完整設定指南：SETUP.md
+• 專案說明：README.md
+• 技術文件：docs/blueprint.md
+
+
+🎉 準備好了嗎？
+--------------
+1. 填入 API Key 到 .env.local
+2. 在 Firebase 啟用 Google 登入
+3. 執行 .\start-app.ps1 或 npm run dev
+4. 開啟 http://localhost:9002/login
+5. 選擇登入方式
+6. 開始使用！
+
+💡 提示：
+  • Google 登入可解決權限問題
+  • 訪客模式資料僅存本機
+  • 建議使用 Google 登入獲得最佳體驗
+
+📚 詳細文件：
+  • GOOGLE_AUTH_SETUP.md - Google 登入設定
+  • README.md - 專案說明
+  • 更新日誌.md - 版本更新記錄
+
+祝你使用愉快！🚀
+

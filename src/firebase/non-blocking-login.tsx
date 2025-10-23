@@ -4,8 +4,32 @@ import {
   signInAnonymously,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut as firebaseSignOut,
   // Assume getAuth and app are initialized elsewhere
 } from 'firebase/auth';
+
+/** Initiate Google sign-in with popup */
+export async function signInWithGoogle(authInstance: Auth): Promise<void> {
+  const provider = new GoogleAuthProvider();
+  try {
+    await signInWithPopup(authInstance, provider);
+  } catch (error) {
+    console.error('Google sign-in error:', error);
+    throw error;
+  }
+}
+
+/** Sign out the current user */
+export async function signOut(authInstance: Auth): Promise<void> {
+  try {
+    await firebaseSignOut(authInstance);
+  } catch (error) {
+    console.error('Sign out error:', error);
+    throw error;
+  }
+}
 
 /** Initiate anonymous sign-in (non-blocking). */
 export function initiateAnonymousSignIn(authInstance: Auth): void {

@@ -18,7 +18,7 @@ export function ContactCard({ contact, onEdit }: ContactCardProps) {
     >
       <div className="relative h-12 w-12 flex-shrink-0">
         <Image
-          src={contact.images?.[0]?.url || "https://picsum.photos/seed/1/100/100"}
+          src={contact.images?.[0]?.thumbUrl || contact.images?.[0]?.url || "https://picsum.photos/seed/1/100/100"}
           alt={contact.name}
           width={48}
           height={48}

@@ -105,7 +105,21 @@
   "privacy_policy_section6_content": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy in the app.",
   "about_version": "Version",
   "about_developer_title": "Developer Information",
-  "about_rights_reserved": "All rights reserved."
+  "about_rights_reserved": "All rights reserved.",
+  "login_title": "Sign In",
+  "login_subtitle": "AI-Powered Smart Business Card Manager",
+  "login_description": "Choose a sign-in method to get started",
+  "login_with_google": "Sign in with Google",
+  "continue_as_guest": "Continue as Guest",
+  "or": "or",
+  "login_disclaimer": "By continuing, you agree to our Terms of Service and Privacy Policy",
+  "login_success_title": "Sign in successful",
+  "login_success_desc": "Welcome to BizCard Pro",
+  "login_failed_title": "Sign in failed",
+  "login_failed_desc": "Unable to sign in. Please try again later",
+  "guest_login_desc": "Signed in as guest",
+  "logout_button": "Sign Out",
+  "account_settings": "Account Settings"
 }
 
     

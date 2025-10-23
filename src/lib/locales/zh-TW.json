@@ -105,7 +105,21 @@
   "privacy_policy_section6_content": "我們可能會不時更新本隱私權政策。我們將透過在應用程式中發布新的隱私權政策來通知您任何變更。",
   "about_version": "版本",
   "about_developer_title": "開發者資訊",
-  "about_rights_reserved": "版權所有。"
+  "about_rights_reserved": "版權所有。",
+  "login_title": "登入",
+  "login_subtitle": "AI 驅動的智慧名片管理",
+  "login_description": "選擇登入方式以開始使用",
+  "login_with_google": "使用 Google 登入",
+  "continue_as_guest": "以訪客身份繼續",
+  "or": "或",
+  "login_disclaimer": "繼續即表示您同意我們的服務條款和隱私政策",
+  "login_success_title": "登入成功",
+  "login_success_desc": "歡迎使用 BizCard Pro",
+  "login_failed_title": "登入失敗",
+  "login_failed_desc": "無法登入，請稍後再試",
+  "guest_login_desc": "以訪客身份登入",
+  "logout_button": "登出",
+  "account_settings": "帳號設定"
 }
 
     

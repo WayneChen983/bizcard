@@ -35,7 +35,7 @@ import {
 import { getSortOptions, sortContacts } from '@/lib/sorting';
 
 import { useFirebase, useCollection, useMemoFirebase, useUser } from '@/firebase';
-import { initiateAnonymousSignIn } from '@/firebase/non-blocking-login';
+import { uploadDataUrlAndGetDownloadUrl, downscaleDataUrl } from '@/firebase/storage';
 import { collection, doc, serverTimestamp } from 'firebase/firestore';
 import { setDocumentNonBlocking, deleteDocumentNonBlocking, addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
@@ -52,14 +52,15 @@ export default function Home() {
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
   const [sortOption, setSortOption] = useState<SortOption>('time');
 
-  const { auth, firestore } = useFirebase();
+  const { firebaseApp, auth, firestore } = useFirebase();
   const { user, isUserLoading } = useUser();
 
+  // 如果未登入，重定向到登入頁面
   useEffect(() => {
     if (!isUserLoading && !user) {
-      initiateAnonymousSignIn(auth);
+      router.push('/login');
     }
-  }, [isUserLoading, user, auth]);
+  }, [isUserLoading, user, router]);
 
   const contactsQuery = useMemoFirebase(() => {
     if (!user) return null;
@@ -126,8 +127,30 @@ export default function Home() {
     setEditingContact(null);
   };
   
-  const handleHomePageScanComplete = useCallback((scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
+  const handleHomePageScanComplete = useCallback(async (scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
     if (!user) return;
+
+    // If we received a Data URL image, upload it to Storage and replace with a download URL
+    let imageUrl: string | undefined = undefined;
+    let thumbUrl: string | undefined = undefined;
+    if (scannedData.cardImageUrl && scannedData.cardImageUrl.startsWith('data:')) {
+      try {
+        const timestamp = Date.now();
+        const safeName = (scannedData.name || 'business-card').replace(/[^a-zA-Z0-9-_]+/g, '-').slice(0, 50);
+        // Create compressed main image and thumbnail
+        const compressed = await downscaleDataUrl(scannedData.cardImageUrl, 1600, 0.8);
+        const thumb = await downscaleDataUrl(scannedData.cardImageUrl, 320, 0.6);
+        const objectPath = `users/${user.uid}/cards/${timestamp}-${safeName}.jpg`;
+        const thumbPath = `users/${user.uid}/cards/${timestamp}-${safeName}-thumb.jpg`;
+        imageUrl = await uploadDataUrlAndGetDownloadUrl(firebaseApp, objectPath, compressed);
+        thumbUrl = await uploadDataUrlAndGetDownloadUrl(firebaseApp, thumbPath, thumb);
+      } catch (e) {
+        console.error('Failed to upload card image to Storage:', e);
+      }
+    } else if (scannedData.cardImageUrl) {
+      imageUrl = scannedData.cardImageUrl;
+    }
+
     const newContactData = {
       name: scannedData.name || t('new_contact_default_name'),
       company: scannedData.company || '',
@@ -140,20 +163,20 @@ export default function Home() {
       socialMedia: scannedData.socialMedia || '',
       other: scannedData.other || '',
       groups: [],
-      images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
+      images: imageUrl ? [{ url: imageUrl, thumbUrl, alt: 'Business card' }] : [],
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
-    
+
     const contactsColRef = collection(firestore, 'users', user.uid, 'contacts');
     addDocumentNonBlocking(contactsColRef, newContactData);
-  
+
     toast({
       title: t('contact_added_toast_title'),
       description: `${newContactData.name} ${t('contact_autosaved_toast_desc')}`,
     });
     setIsScanDialogOpen(false);
-  }, [user, firestore, t, toast]);
+  }, [user, firestore, t, toast, firebaseApp]);
   
   const filteredAndSortedContacts = useMemo(() => {
     let filtered = contacts || [];

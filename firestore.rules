@@ -6,7 +6,9 @@ service cloud.firestore {
     // within their own user-specific path. The {document=**} is a recursive
     // wildcard that matches any document or subcollection below the {userId} path.
     // This rule ensures that a user can only access their own data.
+    // Supports both authenticated and anonymous users.
     match /users/{userId}/{document=**} {
+      // Allow if user is authenticated (including anonymous) and the UID matches
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }

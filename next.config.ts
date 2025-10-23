@@ -23,6 +23,19 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      // Firebase user avatars and Storage download URLs
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
