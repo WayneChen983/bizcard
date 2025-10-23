@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { scanCardDetails, ScanCardDetailsOutput } from '@/ai/flows/scan-card-details';
-import { Camera as CameraIcon, X, Zap, ZapOff, Image as ImageIcon, Check, ArrowLeft, Crop, RefreshCw } from 'lucide-react';
+import { Camera as CameraIcon, X, Zap, ZapOff, Image as ImageIcon, Check, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLanguage } from '@/context/language-context';
 
@@ -36,7 +36,7 @@ export function ScanCardDialog({
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cropCanvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement>(new Image());
+  const imageRef = useRef<HTMLImageElement | null>(null);
 
   const [corners, setCorners] = useState<Point[]>([
     { x: 100, y: 100 },
@@ -48,6 +48,13 @@ export function ScanCardDialog({
   
   const { toast } = useToast();
   const { t } = useLanguage();
+
+  useEffect(() => {
+    // Initialize the imageRef on the client side
+    if (!imageRef.current) {
+      imageRef.current = new window.Image();
+    }
+  }, []);
 
   const stopCamera = useCallback(() => {
     if (videoRef.current && videoRef.current.srcObject) {
@@ -122,7 +129,7 @@ export function ScanCardDialog({
   };
 
   const takePicture = () => {
-    if (videoRef.current && hasCameraPermission) {
+    if (videoRef.current && hasCameraPermission && imageRef.current) {
       const canvas = document.createElement('canvas');
       const video = videoRef.current;
       canvas.width = video.videoWidth;
@@ -133,6 +140,7 @@ export function ScanCardDialog({
         const dataUrl = canvas.toDataURL('image/png');
         imageRef.current.src = dataUrl;
         imageRef.current.onload = () => {
+            if (!imageRef.current) return;
             setImage(dataUrl);
             setStep('crop');
             stopCamera();
@@ -154,12 +162,14 @@ export function ScanCardDialog({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
+    if (selectedFile && imageRef.current) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
+        if (!imageRef.current) return;
         imageRef.current.src = result;
         imageRef.current.onload = () => {
+          if (!imageRef.current) return;
           setImage(result);
           setStep('crop');
           stopCamera();
@@ -205,7 +215,7 @@ export function ScanCardDialog({
   // --- Cropping Logic ---
 
   useEffect(() => {
-    if (step !== 'crop' || !cropCanvasRef.current || !image) return;
+    if (step !== 'crop' || !cropCanvasRef.current || !image || !imageRef.current) return;
 
     const canvas = cropCanvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -264,11 +274,11 @@ export function ScanCardDialog({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     const point = getCanvasPoint(e);
-    if (!point || !imageRef.current.src) return;
+    if (!point || !imageRef.current?.src || !cropCanvasRef.current) return;
 
-    const scale = Math.min(cropCanvasRef.current!.clientWidth / imageRef.current.width, cropCanvasRef.current!.clientHeight / imageRef.current.height);
-    const dx = (cropCanvasRef.current!.clientWidth - imageRef.current.width * scale) / 2;
-    const dy = (cropCanvasRef.current!.clientHeight - imageRef.current.height * scale) / 2;
+    const scale = Math.min(cropCanvasRef.current.clientWidth / imageRef.current.width, cropCanvasRef.current.clientHeight / imageRef.current.height);
+    const dx = (cropCanvasRef.current.clientWidth - imageRef.current.width * scale) / 2;
+    const dy = (cropCanvasRef.current.clientHeight - imageRef.current.height * scale) / 2;
     const scaledCorners = corners.map(p => ({ x: p.x * scale + dx, y: p.y * scale + dy }));
 
     for (let i = 0; i < 4; i++) {
@@ -284,11 +294,11 @@ export function ScanCardDialog({
   const handleMouseMove = (e: React.MouseEvent) => {
     if (draggingCorner === null) return;
     const point = getCanvasPoint(e);
-    if (!point || !imageRef.current.src) return;
+    if (!point || !imageRef.current?.src || !cropCanvasRef.current) return;
 
-    const scale = Math.min(cropCanvasRef.current!.clientWidth / imageRef.current.width, cropCanvasRef.current!.clientHeight / imageRef.current.height);
-    const dx = (cropCanvasRef.current!.clientWidth - imageRef.current.width * scale) / 2;
-    const dy = (cropCanvasRef.current!.clientHeight - imageRef.current.height * scale) / 2;
+    const scale = Math.min(cropCanvasRef.current.clientWidth / imageRef.current.width, cropCanvasRef.current.clientHeight / imageRef.current.height);
+    const dx = (cropCanvasRef.current.clientWidth - imageRef.current.width * scale) / 2;
+    const dy = (cropCanvasRef.current.clientHeight - imageRef.current.height * scale) / 2;
     
     const newCorners = [...corners];
     newCorners[draggingCorner] = {
@@ -301,9 +311,10 @@ export function ScanCardDialog({
   const handleMouseUp = () => setDraggingCorner(null);
 
   const confirmAndScan = () => {
-    if (!imageRef.current.src) return;
+    if (!imageRef.current?.src) return;
     
     const getTransformedImage = () => {
+        if (!imageRef.current) return null;
         const w = imageRef.current.width;
         const h = imageRef.current.height;
 
@@ -456,3 +467,5 @@ export function ScanCardDialog({
     </Dialog>
   );
 }
+
+    
