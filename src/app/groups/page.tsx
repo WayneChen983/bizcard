@@ -19,7 +19,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
   Dialog,
@@ -30,54 +29,47 @@ import {
   DialogFooter,
   DialogClose
 } from '@/components/ui/dialog';
+import { useFirebase, useCollection, useMemoFirebase, useUser } from '@/firebase';
+import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const GROUPS_STORAGE_KEY = 'bizcard-pro-groups';
 
 const GroupsPage = () => {
   const router = useRouter();
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [groups, setGroups] = useState<Group[]>([]);
   const [newGroupName, setNewGroupName] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  
+  const { firestore } = useFirebase();
+  const { user } = useUser();
 
-  useEffect(() => {
-    try {
-      const storedGroups = localStorage.getItem(GROUPS_STORAGE_KEY);
-      if (storedGroups) {
-        setGroups(JSON.parse(storedGroups));
-      }
-    } catch (error) {
-      console.error('Failed to load groups from localStorage', error);
-    }
-  }, []);
+  const groupsQuery = useMemoFirebase(() => {
+    if (!user) return null;
+    return collection(firestore, 'users', user.uid, 'groups');
+  }, [firestore, user]);
+  const { data: groups = [], isLoading: groupsLoading } = useCollection<Group>(groupsQuery);
 
-  const saveGroups = (updatedGroups: Group[]) => {
-    try {
-      localStorage.setItem(GROUPS_STORAGE_KEY, JSON.stringify(updatedGroups));
-    } catch (error) {
-      console.error('Failed to save groups to localStorage', error);
-    }
-  };
 
   const handleAddGroup = () => {
-    if (newGroupName.trim() === '') return;
-    const newGroup: Group = {
-      id: new Date().toISOString(),
+    if (newGroupName.trim() === '' || !user) return;
+    
+    const groupsColRef = collection(firestore, 'users', user.uid, 'groups');
+    addDocumentNonBlocking(groupsColRef, {
       name: newGroupName.trim(),
-    };
-    const updatedGroups = [...groups, newGroup];
-    setGroups(updatedGroups);
-    saveGroups(updatedGroups);
+      createdAt: serverTimestamp(),
+    });
+
     setNewGroupName('');
     setIsAddDialogOpen(false);
     toast({ title: t('group_added_toast_title') });
   };
 
   const handleDeleteGroup = (id: string) => {
-    const updatedGroups = groups.filter((group) => group.id !== id);
-    setGroups(updatedGroups);
-    saveGroups(updatedGroups);
+    if (!user) return;
+    const groupDocRef = doc(firestore, 'users', user.uid, 'groups', id);
+    deleteDocumentNonBlocking(groupDocRef);
     toast({ title: t('group_deleted_toast_title') });
   };
 
@@ -118,37 +110,41 @@ const GroupsPage = () => {
           </DialogContent>
         </Dialog>
         <div className="mt-6 flex flex-col gap-2">
-          {groups.map((group) => (
-            <div
-              key={group.id}
-              className="flex items-center justify-between rounded-lg bg-card p-4 border"
-            >
-              <Link href={`/groups/${group.id}`} className="flex-1">
-                <span className="hover:underline">{group.name}</span>
-              </Link>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Trash2 className="h-5 w-5 text-destructive" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{t('delete_group_dialog_title')}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {t('delete_group_dialog_desc')}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{t('cancel_button')}</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDeleteGroup(group.id)}>
-                      {t('delete_button')}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          ))}
+          {groupsLoading ? (
+            [...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)
+          ) : (
+            groups.map((group) => (
+              <div
+                key={group.id}
+                className="flex items-center justify-between rounded-lg bg-card p-4 border"
+              >
+                <Link href={`/groups/${group.id}`} className="flex-1">
+                  <span className="hover:underline">{group.name}</span>
+                </Link>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Trash2 className="h-5 w-5 text-destructive" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t('delete_group_dialog_title')}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t('delete_group_dialog_desc')}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{t('cancel_button')}</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDeleteGroup(group.id)}>
+                        {t('delete_button')}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            ))
+          )}
         </div>
       </main>
     </div>

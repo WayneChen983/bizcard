@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Contact, Group, SortOption } from '@/lib/types';
-import { initialContacts, initialGroups } from '@/lib/contacts-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -15,7 +14,7 @@ import {
 } from '@/components/ui/sheet';
 import { ContactForm } from '@/components/contact-form';
 import { ContactList } from '@/components/contact-list';
-import { Search, Settings, Folder, ListFilter } from 'lucide-react';
+import { Search, Settings, ListFilter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
@@ -35,57 +34,45 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getSortOptions, sortContacts } from '@/lib/sorting';
 
-const CONTACTS_STORAGE_KEY = 'bizcard-pro-contacts';
-const GROUPS_STORAGE_KEY = 'bizcard-pro-groups';
+import { useFirebase, useCollection, useMemoFirebase, useUser } from '@/firebase';
+import { initiateAnonymousSignIn } from '@/firebase/non-blocking-login';
+import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { setDocumentNonBlocking, deleteDocumentNonBlocking, addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+
 
 export default function Home() {
   const router = useRouter();
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [groups, setGroups] = useState<Group[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
   const [sortOption, setSortOption] = useState<SortOption>('time');
 
-  useEffect(() => {
-    try {
-      const storedContacts = localStorage.getItem(CONTACTS_STORAGE_KEY);
-      if (storedContacts) {
-        setContacts(JSON.parse(storedContacts));
-      } else {
-        setContacts(initialContacts);
-      }
-
-      const storedGroups = localStorage.getItem(GROUPS_STORAGE_KEY);
-      if (storedGroups) {
-        setGroups(JSON.parse(storedGroups));
-      } else {
-        setGroups(initialGroups);
-      }
-    } catch (error) {
-      console.error('Failed to load data from localStorage', error);
-      setContacts(initialContacts);
-      setGroups(initialGroups);
-    }
-    setIsInitialized(true);
-  }, []);
+  const { auth, firestore } = useFirebase();
+  const { user, isUserLoading } = useUser();
 
   useEffect(() => {
-    if (isInitialized) {
-      try {
-        localStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(contacts));
-        localStorage.setItem(GROUPS_STORAGE_KEY, JSON.stringify(groups));
-      } catch (error) {
-        console.error('Failed to save data to localStorage', error);
-      }
+    if (!isUserLoading && !user) {
+      initiateAnonymousSignIn(auth);
     }
-  }, [contacts, groups, isInitialized]);
+  }, [isUserLoading, user, auth]);
+
+  const contactsQuery = useMemoFirebase(() => {
+    if (!user) return null;
+    return collection(firestore, 'users', user.uid, 'contacts');
+  }, [firestore, user]);
+  const { data: contacts = [], isLoading: contactsLoading } = useCollection<Contact>(contactsQuery);
+
+  const groupsQuery = useMemoFirebase(() => {
+    if (!user) return null;
+    return collection(firestore, 'users', user.uid, 'groups');
+  }, [firestore, user]);
+  const { data: groups = [], isLoading: groupsLoading } = useCollection<Group>(groupsQuery);
+
 
   const handleAddNew = () => {
     setEditingContact(null);
@@ -98,7 +85,9 @@ export default function Home() {
   };
 
   const handleDelete = (id: string) => {
-    setContacts((prev) => prev.filter((c) => c.id !== id));
+    if (!user) return;
+    const contactDocRef = doc(firestore, 'users', user.uid, 'contacts', id);
+    deleteDocumentNonBlocking(contactDocRef);
     toast({
       title: t('contact_deleted_toast_title'),
       description: t('contact_deleted_toast_desc'),
@@ -108,29 +97,38 @@ export default function Home() {
   };
 
   const handleSave = (contact: Contact) => {
+    if (!user) return;
     setIsSaving(true);
-    // Simulate async save
-    setTimeout(() => {
-      if (editingContact && contacts.some(c => c.id === contact.id)) {
-        setContacts((prev) =>
-          prev.map((c) => (c.id === contact.id ? { ...contact, createdAt: contact.createdAt || new Date().toISOString() } : c))
-        );
-        toast({ title: t('contact_updated_toast_title') });
-      } else {
-        const newContact = { ...contact, id: contact.id || new Date().toISOString(), createdAt: new Date().toISOString() };
-        setContacts((prev) => [newContact, ...prev]);
-        toast({ title: t('contact_added_toast_title') });
-      }
-      setIsSaving(false);
-      setIsSheetOpen(false);
-      setEditingContact(null);
-    }, 500);
+    
+    const contactWithTimestamp = {
+      ...contact,
+      updatedAt: serverTimestamp(),
+    };
+
+    if (editingContact && contacts.some(c => c.id === contact.id)) {
+      const contactDocRef = doc(firestore, 'users', user.uid, 'contacts', contact.id);
+      const { id, ...contactData } = contactWithTimestamp;
+      setDocumentNonBlocking(contactDocRef, contactData, { merge: true });
+      toast({ title: t('contact_updated_toast_title') });
+    } else {
+      const newContact = { 
+        ...contactWithTimestamp, 
+        createdAt: serverTimestamp(),
+      };
+      const { id, ...contactData } = newContact;
+      const contactsColRef = collection(firestore, 'users', user.uid, 'contacts');
+      addDocumentNonBlocking(contactsColRef, contactData);
+      toast({ title: t('contact_added_toast_title') });
+    }
+
+    setIsSaving(false);
+    setIsSheetOpen(false);
+    setEditingContact(null);
   };
   
   const handleHomePageScanComplete = useCallback((scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
-    const newContact: Contact = {
-      id: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
+    if (!user) return;
+    const newContactData = {
       name: scannedData.name || t('new_contact_default_name'),
       company: scannedData.company || '',
       jobTitle: scannedData.jobTitle || '',
@@ -143,19 +141,22 @@ export default function Home() {
       other: scannedData.other || '',
       groups: [],
       images: scannedData.cardImageUrl ? [{ url: scannedData.cardImageUrl, alt: 'Business card' }] : [],
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     };
-
-    setContacts(prevContacts => [newContact, ...prevContacts]);
+    
+    const contactsColRef = collection(firestore, 'users', user.uid, 'contacts');
+    addDocumentNonBlocking(contactsColRef, newContactData);
   
     toast({
       title: t('contact_added_toast_title'),
-      description: `${newContact.name} ${t('contact_autosaved_toast_desc')}`,
+      description: `${newContactData.name} ${t('contact_autosaved_toast_desc')}`,
     });
     setIsScanDialogOpen(false);
-  }, [t]);
+  }, [user, firestore, t]);
   
   const filteredAndSortedContacts = useMemo(() => {
-    let filtered = contacts;
+    let filtered = contacts || [];
 
     if (searchQuery) {
       filtered = filtered.filter(
@@ -226,7 +227,7 @@ export default function Home() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            {groups.length > 0 && (
+            {groups && groups.length > 0 && (
                <ScrollArea className="w-full whitespace-nowrap">
                 <div className="flex gap-2 pb-2">
                     <Button
@@ -258,6 +259,7 @@ export default function Home() {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onAddNew={handleAddNew}
+              isLoading={contactsLoading || isUserLoading}
             />
           </ScrollArea>
         </main>

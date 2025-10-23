@@ -4,6 +4,7 @@
 import { pinyin } from 'pinyin-pro';
 import type { Contact, SortOption } from './types';
 import type { Language } from './i18n';
+import { Timestamp } from 'firebase/firestore';
 
 // A helper function to get stroke count for a single character
 // For simplicity, we'll use a library or a pre-compiled map.
@@ -36,13 +37,20 @@ const compareByZhuyin = (a: Contact, b: Contact): number => {
     return pinyin(a.name, { toneType: 'none' }).localeCompare(pinyin(b.name, { toneType: 'none' }), 'zh-TW');
 };
 
+const toDate = (timestamp: Timestamp | string): Date => {
+  if (timestamp instanceof Timestamp) {
+    return timestamp.toDate();
+  }
+  return new Date(timestamp);
+}
+
 // Function to sort contacts
 export const sortContacts = (contacts: Contact[], option: SortOption): Contact[] => {
   const sortedContacts = [...contacts]; // Create a shallow copy to avoid mutating the original array
 
   switch (option) {
     case 'time':
-      return sortedContacts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      return sortedContacts.sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime());
     
     case 'alphabetical':
       return sortedContacts.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));

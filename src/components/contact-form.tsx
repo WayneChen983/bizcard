@@ -34,6 +34,7 @@ import {
 import { useLanguage } from '@/context/language-context';
 import { Separator } from './ui/separator';
 import { Checkbox } from './ui/checkbox';
+import { Timestamp } from 'firebase/firestore';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
@@ -81,36 +82,45 @@ export function ContactForm({ contact, groups, onSave, onDelete, isSaving }: Con
   });
 
   useEffect(() => {
-    const defaultValues = {
-      name: contact?.name || '',
-      company: contact?.company || '',
-      jobTitle: contact?.jobTitle || '',
-      phone: contact?.phone || '',
-      mobilePhone: contact?.mobilePhone || '',
-      email: contact?.email || '',
-      website: contact?.website || '',
-      address: contact?.address || '',
-      socialMedia: contact?.socialMedia || '',
-      other: contact?.other || '',
-      groups: contact?.groups || [],
-    };
-    form.reset(defaultValues);
+    if (contact) {
+      form.reset({
+        name: contact.name || '',
+        company: contact.company || '',
+        jobTitle: contact.jobTitle || '',
+        phone: contact.phone || '',
+        mobilePhone: contact.mobilePhone || '',
+        email: contact.email || '',
+        website: contact.website || '',
+        address: contact.address || '',
+        socialMedia: contact.socialMedia || '',
+        other: contact.other || '',
+        groups: contact.groups || [],
+      });
+    } else {
+      form.reset({
+        name: '',
+        company: '',
+        jobTitle: '',
+        phone: '',
+        mobilePhone: '',
+        email: '',
+        website: '',
+        address: '',
+        socialMedia: '',
+        other: '',
+        groups: [],
+      });
+    }
   }, [contact, form]);
 
 
   function onSubmit(values: ContactFormValues) {
-    let images = contact?.images || [];
-
-    if (contact?.images?.[0] && !images.some(img => img.url === contact.images?.[0].url)) {
-      images = [...contact.images, ...images];
-    }
-    
     const newContact: Contact = {
       id: contact?.id || '',
       createdAt: contact?.createdAt || new Date().toISOString(),
       ...values,
       groups: values.groups || [],
-      images: images,
+      images: contact?.images || [],
     };
     onSave(newContact);
   }
@@ -368,5 +378,3 @@ export function ContactForm({ contact, groups, onSave, onDelete, isSaving }: Con
     </>
   );
 }
-
-    

@@ -2,13 +2,13 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import type { Metadata } from 'next';
 import { Inter, PT_Sans } from 'next/font/google';
 import './globals.css';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { LanguageProvider } from '@/context/language-context';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -78,14 +78,16 @@ export default function RootLayout({
           fontHeadline.variable
         )}
       >
-        <LanguageProvider>
-          <div className="relative flex h-screen w-full justify-center bg-background">
-            <div className="relative flex h-full w-full max-w-md flex-col border-x">
-              {children}
+        <FirebaseClientProvider>
+          <LanguageProvider>
+            <div className="relative flex h-screen w-full justify-center bg-background">
+              <div className="relative flex h-full w-full max-w-md flex-col border-x">
+                {children}
+              </div>
             </div>
-          </div>
-          <Toaster />
-        </LanguageProvider>
+            <Toaster />
+          </LanguageProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );

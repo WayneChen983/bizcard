@@ -1,6 +1,10 @@
+
+import { Timestamp } from 'firebase/firestore';
+
 export type Contact = {
   id: string;
-  createdAt: string; // ISO 8601 date string
+  createdAt: Timestamp | string; // Can be Timestamp from Firestore or string for new objects
+  updatedAt?: Timestamp;
   name: string;
   company: string;
   jobTitle: string;
@@ -18,6 +22,7 @@ export type Contact = {
 export type Group = {
   id: string;
   name: string;
+  createdAt?: Timestamp;
 };
 
 export type SortOption = 'time' | 'alphabetical' | 'stroke' | 'zhuyin' | 'gojuon' | 'ganada' | 'cyrillic';
