@@ -59,7 +59,7 @@ export function ScanCardDialog({
   const { t } = useLanguage();
   const [crop, setCrop] = useState<CropType>();
   const [completedCrop, setCompletedCrop] = useState<CropType>();
-  const [aspect, setAspect] = useState<number | undefined>(16 / 9);
+  const [aspect, setAspect] = useState<number | undefined>(1.7);
 
   const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
@@ -180,15 +180,6 @@ export function ScanCardDialog({
                 'cropped-card.png'
             );
             handleScan(croppedImageDataUrl);
-            
-            // Save image to device
-            const link = document.createElement('a');
-            link.href = croppedImageDataUrl;
-            link.download = `bizcard-cropped-${new Date().toISOString()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
         } catch (e) {
             console.error(e);
             toast({
@@ -234,8 +225,10 @@ export function ScanCardDialog({
   };
 
   function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
-    const { width, height } = e.currentTarget
-    setCrop(centerAspectCrop(width, height, 1.7))
+    if (aspect) {
+      const { width, height } = e.currentTarget
+      setCrop(centerAspectCrop(width, height, aspect))
+    }
   }
 
   const toggleFlash = async () => {
@@ -264,7 +257,7 @@ export function ScanCardDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md w-full h-screen flex flex-col p-0 gap-0 bg-black text-white">
         <DialogHeader className="p-4 flex flex-row items-center justify-between border-b border-gray-700 z-10 bg-black">
-          <DialogTitle className='font-headline text-white'>{image ? t('crop_instruction') || 'Crop Card' : t('scan_card_dialog_title')}</DialogTitle>
+          <DialogTitle className='font-headline text-white'>{image ? t('crop_instruction') : t('scan_card_dialog_title')}</DialogTitle>
           <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
             <X className="h-6 w-6 text-white" />
           </Button>
@@ -321,7 +314,7 @@ export function ScanCardDialog({
               </Button>
               <Button onClick={confirmAndScan} className="bg-primary text-primary-foreground">
                 <Crop className="mr-2 h-5 w-5" />
-                {t('crop_and_use_button') || 'Crop & Use'}
+                {t('crop_and_use_button')}
               </Button>
             </>
           ) : (
@@ -341,3 +334,5 @@ export function ScanCardDialog({
     </Dialog>
   );
 }
+
+    
