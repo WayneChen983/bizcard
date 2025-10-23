@@ -127,7 +127,7 @@ export default function Home() {
     }, 500);
   };
   
-  const handleHomePageScanComplete = useCallback((scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
+  const handleHomePageScanComplete = (scannedData: Partial<ScanCardDetailsOutput> & { cardImageUrl?: string }) => {
     const newContact: Contact = {
       id: new Date().toISOString(),
       createdAt: new Date().toISOString(),
@@ -152,7 +152,7 @@ export default function Home() {
       description: `${newContact.name} ${t('contact_autosaved_toast_desc')}`,
     });
     setIsScanDialogOpen(false);
-  }, [t]);
+  };
   
   const filteredAndSortedContacts = useMemo(() => {
     let filtered = contacts;
