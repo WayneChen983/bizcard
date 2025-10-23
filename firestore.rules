@@ -1,57 +1,9 @@
-/**
- * @file Firestore Security Rules
- * @core_philosophy This ruleset enforces a strict user-ownership model. Each user has exclusive access to their own contacts and groups.
- * @data_structure All data is nested under /users/{userId}, ensuring that all contact and group data is private to the owning user.
- * @key_security_decisions User listing is disallowed to protect privacy. All write operations are restricted to the owning user, based on their `uid`. Data validation is limited to ensuring path-based ownership and preventing changes to the ownership fields.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    /**
-     * @description Controls access to individual contact documents. Each user can only read, create, update, and delete their own contacts.
-     * @path /users/{userId}/contacts/{contactId}
-     * @allow (create) - Authenticated user with UID 'user123' can create a contact document under /users/user123/contacts/. The contact document should have a structure based on the Contact schema.
-     * @allow (update) - Authenticated user with UID 'user123' can update a contact document under /users/user123/contacts/contact456.
-     * @allow (delete) - Authenticated user with UID 'user123' can delete a contact document under /users/user123/contacts/contact456.
-     * @deny (create) - Authenticated user with UID 'user456' cannot create a contact document under /users/user123/contacts/ because they are not the owner.
-     * @principle Enforces document ownership for writes.
-     */
-    match /users/{userId}/contacts/{contactId} {
-      allow get: if isSignedIn() && isOwner(userId);
-      allow list: if isSignedIn() && isOwner(userId);
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isSignedIn() && isExistingOwner(userId);
-      allow delete: if isSignedIn() && isExistingOwner(userId);
+    // Allow logged-in users (including anonymous) to read/write their own data
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
-
-    /**
-     * @description Controls access to individual group documents. Each user can only read, create, update, and delete their own groups.
-     * @path /users/{userId}/groups/{groupId}
-     * @allow (create) - Authenticated user with UID 'user123' can create a group document under /users/user123/groups/. The group document should have a structure based on the Group schema.
-     * @allow (update) - Authenticated user with UID 'user123' can update a group document under /users/user123/groups/group456.
-     * @allow (delete) - Authenticated user with UID 'user123' can delete a group document under /users/user123/groups/group456.
-     * @deny (create) - Authenticated user with UID 'user456' cannot create a group document under /users/user123/groups/ because they are not the owner.
-     * @principle Enforces document ownership for writes.
-     */
-    match /users/{userId}/groups/{groupId} {
-      allow get: if isSignedIn() && isOwner(userId);
-      allow list: if isSignedIn() && isOwner(userId);
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isSignedIn() && isExistingOwner(userId);
-      allow delete: if isSignedIn() && isExistingOwner(userId);
-    }
-  }
-
-  // Helper functions
-  function isSignedIn() {
-    return request.auth != null;
-  }
-
-  function isOwner(userId) {
-    return request.auth.uid == userId;
-  }
-
-  function isExistingOwner(userId) {
-    return isSignedIn() && isOwner(userId) && resource != null;
   }
 }
