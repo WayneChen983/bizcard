@@ -38,22 +38,36 @@ const getInitialLanguage = (): Language => {
 };
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-  const [language, setLanguageState] = useState<Language>(getInitialLanguage);
+  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setLanguageState(getInitialLanguage());
+    setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      const initialLanguage = getInitialLanguage();
+      setLanguageState(initialLanguage);
+    }
+  }, [mounted]);
 
   const setLanguage = (lang: Language) => {
     if (languages[lang]) {
       setLanguageState(lang);
-      localStorage.setItem('language', lang);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('language', lang);
+      }
     }
   };
 
   const t = useCallback((key: string): string => {
+    // On the server or before hydration, always use default language to prevent mismatch
+    if (!mounted) {
+      return translations[DEFAULT_LANGUAGE][key] || key;
+    }
     return translations[language][key] || translations[DEFAULT_LANGUAGE][key] || key;
-  }, [language]);
+  }, [language, mounted]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, languages }}>
