@@ -49,7 +49,7 @@ const GroupsPage = () => {
     if (!user) return null;
     return collection(firestore, 'users', user.uid, 'groups');
   }, [firestore, user]);
-  const { data: groups = [], isLoading: groupsLoading } = useCollection<Group>(groupsQuery);
+  const { data: groups, isLoading: groupsLoading } = useCollection<Group>(groupsQuery);
 
 
   const handleAddGroup = () => {
@@ -113,7 +113,7 @@ const GroupsPage = () => {
           {groupsLoading ? (
             [...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)
           ) : (
-            groups.map((group) => (
+            groups && groups.map((group) => (
               <div
                 key={group.id}
                 className="flex items-center justify-between rounded-lg bg-card p-4 border"
