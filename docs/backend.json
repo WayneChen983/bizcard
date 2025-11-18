@@ -1,0 +1,163 @@
+{
+  "entities": {
+    "Contact": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Contact",
+      "type": "object",
+      "description": "Represents a contact with their personal and professional information.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Contact entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the contact."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the contact."
+        },
+        "company": {
+          "type": "string",
+          "description": "The company the contact works for."
+        },
+        "jobTitle": {
+          "type": "string",
+          "description": "The job title of the contact."
+        },
+        "phoneNumbers": {
+          "type": "array",
+          "description": "An array of phone numbers for the contact.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mobilePhoneNumbers": {
+          "type": "array",
+          "description": "An array of mobile phone numbers for the contact.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "emails": {
+          "type": "array",
+          "description": "An array of email addresses for the contact.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "websites": {
+          "type": "array",
+          "description": "An array of website URLs for the contact.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "addresses": {
+          "type": "array",
+          "description": "An array of addresses for the contact.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "socialMediaLinks": {
+          "type": "array",
+          "description": "An array of social media links for the contact.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "otherInfo": {
+          "type": "string",
+          "description": "Other information about the contact."
+        },
+        "groupIds": {
+          "type": "array",
+          "description": "References to Groups. (Relationship: Group N:N Contact)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Group": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Group",
+      "type": "object",
+      "description": "Represents a group of contacts.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Group entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the group."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the group."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}/contacts/{contactId}",
+        "definition": {
+          "entityName": "Contact",
+          "schema": {
+            "$ref": "#/backend/entities/Contact"
+          },
+          "description": "Stores contact information for a specific user. Path-based ownership ensures only the user can access their contacts.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The ID of the user who owns the contact."
+            },
+            {
+              "name": "contactId",
+              "description": "The ID of the contact document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/groups/{groupId}",
+        "definition": {
+          "entityName": "Group",
+          "schema": {
+            "$ref": "#/backend/entities/Group"
+          },
+          "description": "Stores group information for a specific user. Path-based ownership ensures only the user can access their groups.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The ID of the user who owns the group."
+            },
+            {
+              "name": "groupId",
+              "description": "The ID of the group document."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This design prioritizes Authorization Independence and QAPs by adhering to the core design principles and strategy mandates. User-owned contact and group data is stored under their respective user IDs, ensuring clear ownership and simplified security rules. The structure avoids hierarchical authorization dependencies by relying on path-based ownership and membership maps. Specifically:\n\n*   **Authorization Independence:** Contact documents store group memberships in the `groupIds` array, removing the need to fetch parent group documents for authorization.  This allows for atomic operations and simplifies security rules. Similarly, groups are owned by a user, and this relationship is enforced by storing the groups under the `users/{userId}` path.\n*   **Structural Segregation:** Contacts and Groups are stored in separate collections under each user, ensuring homogeneous security postures.\n*   **Access Modeling:** Path-based ownership is used for private user data (contacts and groups). Contacts also store references to Group IDs to represent the N:N relationship. This eliminates the need for subcollections and keeps security rules simple.\n*   **QAPs:** Listing contacts is secured by scoping them under the user's ID (`/users/{userId}/contacts/{contactId}`).  Listing groups is secured similarly (`/users/{userId}/groups/{groupId}`)."
+  }
+}
